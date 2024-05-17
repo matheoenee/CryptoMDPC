@@ -1,17 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 // Fonction pour allouer une matrice carrée de taille n
-int** allocateMatrix(int n) {
-    int** matrix = (int**)malloc(n * sizeof(int*));
+bool** allocateMatrix(int n) {
+    bool** matrix = (bool**)malloc(n * sizeof(bool*));
     for (int i = 0; i < n; i++) {
-        matrix[i] = (int*)malloc(n * sizeof(int));
+        matrix[i] = (bool*)malloc(n * sizeof(bool));
     }
     return matrix;
 }
 
 // Fonction pour libérer la mémoire d'une matrice carrée de taille n
-void freeMatrix(int** matrix, int n) {
+void freeMatrix(bool** matrix, int n) {
     for (int i = 0; i < n; i++) {
         free(matrix[i]);
     }
@@ -19,7 +20,7 @@ void freeMatrix(int** matrix, int n) {
 }
 
 // Fonction pour afficher une matrice carrée de taille n
-void printMatrix(int** matrix, int n) {
+void printMatrix(bool** matrix, int n) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             printf("%d ", matrix[i][j]);
@@ -29,38 +30,37 @@ void printMatrix(int** matrix, int n) {
 }
 
 // Fonction pour trouver l'inverse binaire d'une matrice carrée de taille n
-int** binary_inverse(int** A, int n) {
+bool** binary_inverse(bool** A, int n) {
     int i, j, k;
 
     // Allocation de la matrice augmentée
-    int** augmented = (int**)malloc(n * sizeof(int*));
+    bool** augmented = (bool**)malloc(n * sizeof(bool*));
     for (i = 0; i < n; i++) {
-        augmented[i] = (int*)malloc(2 * n * sizeof(int));
+        augmented[i] = (bool*)malloc(2 * n * sizeof(bool));
         for (j = 0; j < n; j++) {
             augmented[i][j] = A[i][j];
         }
         for (j = n; j < 2 * n; j++) {
-            augmented[i][j] = (i == (j - n)) ? 1 : 0;
+            augmented[i][j] = (i == (j - n)) ? true : false;
         }
     }
 
     // Application de l'élimination de Gauss-Jordan
     for (i = 0; i < n; i++) {
-        if (augmented[i][i] == 0) {
+        if (!augmented[i][i]) {
             // Trouver une ligne en dessous de i avec un 1 dans la colonne i et échanger
             for (j = i + 1; j < n; j++) {
-                if (augmented[j][i] == 1) {
-                    int* temp = augmented[i];
+                if (augmented[j][i]) {
+                    bool* temp = augmented[i];
                     augmented[i] = augmented[j];
                     augmented[j] = temp;
                     break;
                 }
             }
         }
-
-        // Tester les autres lignes pour supprimer les 1 et les remplacer en 0
+        // Chercher parmi les autres lignes celle qui ont un 1 dans la colonne
         for (j = 0; j < n; j++) {
-            if (i != j && augmented[j][i] == 1) {
+            if (i != j && augmented[j][i]) {
                 for (k = 0; k < 2 * n; k++) {
                     augmented[j][k] ^= augmented[i][k]; // XOR avec la ligne i
                 }
@@ -69,7 +69,7 @@ int** binary_inverse(int** A, int n) {
     }
 
     // Extraction de la matrice inverse
-    int** inverse = allocateMatrix(n);
+    bool** inverse = allocateMatrix(n);
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
             inverse[i][j] = augmented[i][j + n];
@@ -87,7 +87,7 @@ int** binary_inverse(int** A, int n) {
 
 int main() {
     int n = 3;
-    int** A = allocateMatrix(n);
+    bool** A = allocateMatrix(n);
 
     // Exemple de matrice binaire
     A[0][0] = 1; A[0][1] = 0; A[0][2] = 1;
@@ -97,7 +97,7 @@ int main() {
     printf("Matrice originale:\n");
     printMatrix(A, n);
 
-    int** inverse = binary_inverse(A, n);
+    bool** inverse = binary_inverse(A, n);
 
     if (inverse != NULL) {
         printf("Matrice inverse:\n");
