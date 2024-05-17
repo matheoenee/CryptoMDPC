@@ -47,7 +47,7 @@ bool** binary_inverse(bool** A, int n) {
 
     // Application de l'élimination de Gauss-Jordan
     for (i = 0; i < n; i++) {
-        if (!augmented[i][i]) {
+        if (augmented[i][i] == 0) {
             // Trouver une ligne en dessous de i avec un 1 dans la colonne i et échanger
             for (j = i + 1; j < n; j++) {
                 if (augmented[j][i]) {
@@ -57,6 +57,7 @@ bool** binary_inverse(bool** A, int n) {
                     break;
                 }
             }
+            if (j == n) return NULL; // La matrice n'est pas inversible
         }
         // Chercher parmi les autres lignes celle qui ont un 1 dans la colonne
         for (j = 0; j < n; j++) {
