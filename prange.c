@@ -35,7 +35,7 @@ int* randomInformationSet(int n, int k){
 }
 
 // Fonction qui retourne sous-matrice de taille (n-k) de A dont les colonnes sont indexées par I
-bool** indexedMatrix(bool** A, bool* I, int n, int k){
+bool** indexedMatrix(bool** A, int* I, int n, int k){
     bool** AI = allocateMatrix(n-k, 0);
     for(int i = 0; i < (n-k); i++){
         for(int j = 0; j < (n-k); j++){

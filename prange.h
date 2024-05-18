@@ -7,7 +7,7 @@
 int* randomInformationSet(int n, int k);
 
 // Fonction qui retourne sous-matrice de taille (n-k) de A dont les colonnes sont indexées par I
-bool** indexedMatrix(bool** A, bool* I, int n, int k);
+bool** indexedMatrix(bool** A, int* I, int n, int k);
 
 // Algorithme de Prange
 bool* Prange(bool** H, bool* s, int t, int n, int k);

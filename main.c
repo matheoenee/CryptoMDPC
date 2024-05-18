@@ -10,7 +10,7 @@ int main() {
     bool* v = allocateVector(n);
 
     // Exemple de matrice binaire
-    v[0] = 1; v[1] = 1; v[2] = 1;
+    v[0] = 1; v[1] = 0; v[2] = 1;
 
     printf("Vecteur originale:\n");
     printVector(v, n);
