@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "time.h": "c",
+        "stdbool.h": "c",
+        "stdio.h": "c",
+        "binary_inverse.h": "c",
+        "matrix.h": "c"
+    }
+}
