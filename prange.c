@@ -57,6 +57,6 @@ bool* Prange(bool** H, bool* s, int t, int n, int k){
             bool* x = matrixProduct(n-k, s, HII);
             w = hammingWeight(x, n);
         }
-        return x;
     }
+    return x;
 }
