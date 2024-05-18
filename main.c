@@ -1,25 +1,23 @@
- #include "binary_inverse.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include "binary_inverse.h"
+#include "prange.h"
+#include "matrix.h"
 
 int main() {
     int n = 3;
-    bool** A = allocateMatrix(n);
+    bool* v = allocateVector(n);
 
     // Exemple de matrice binaire
-    A[0][0] = 1; A[0][1] = 1; A[0][2] = 1;
-    A[1][0] = 1; A[1][1] = 0; A[1][2] = 1;
-    A[2][0] = 0; A[2][1] = 1; A[2][2] = 1;
+    v[0] = 1; v[1] = 1; v[2] = 1;
 
-    printf("Matrice originale:\n");
-    printMatrix(A, n);
+    printf("Vecteur originale:\n");
+    printVector(v, n);
 
-    bool** inverse = binary_inverse(A, n);
+    int weight = hammingWeight(v,n);
+    printf("Poids : %d",weight);
 
-    if (inverse != NULL) {
-        printf("Matrice inverse:\n");
-        printMatrix(inverse, n);
-        freeMatrix(inverse, n);
-    }
-
-    freeMatrix(A, n);
+    free(v);
     return 0;
 }
