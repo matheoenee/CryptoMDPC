@@ -5,7 +5,11 @@
 
 typedef struct {
     bool *elements;
-    int *elemInts;
+    int size;
+} BinaryVector;
+
+typedef struct {
+    int *elements;
     int size;
 } Vector;
 
@@ -13,6 +17,6 @@ typedef struct {
     bool **elements;
     int rows;
     int cols;
-} Matrix;
+} BinaryMatrix;
 
 #endif //CRYPTOMDPC_STRUCTURES_H

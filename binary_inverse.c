@@ -1,62 +1,70 @@
 #include "binary_inverse.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "matrix.h"
 
-// Fonction pour trouver l'inverse binaire d'une matrice carrée de taille n
-bool** binary_inverse(bool** A, int n) {
+#include "matrix.h"
+#include "structures.h"
+
+// Fonction pour calculer l'inverse d'une matrice binaire
+BinaryMatrix binaryMatrixInverse(BinaryMatrix A) {
     int i, j, k;
+    int n = A.rows;
+
+    // Tester si la matrice est bien carré, sinon renvoyer une matrice vide
+    BinaryMatrix I = initBinaryMatrix(n,n);
+    if (A.cols != n){
+        printf("[+] binary inversion impossible.\n");
+        return I;
+    }
 
     // Allocation de la matrice augmentée
-    bool** augmented = (bool**)malloc(n * sizeof(bool*));
+    BinaryMatrix B = initBinaryMatrix(n,2*n);
     for(i = 0; i < n; i++) {
-        augmented[i] = (bool*)malloc(2 * n * sizeof(bool));
-        for(j = 0; j < n; j++) {
-            augmented[i][j] = A[i][j];
+        for(j = 0; j < n; j++){
+            B.elements[i][j] = A.elements[i][j];
         }
         for(j = n; j < 2 * n; j++) {
-            augmented[i][j] = (i == (j - n)) ? true : false;
+            B.elements[i][j] = (i == (j - n)) ? true : false;
         }
     }
 
     // Application de l'élimination de Gauss-Jordan
     for(i = 0; i < n; i++) {
-        if(augmented[i][i] == 0) {
+        if(B.elements[i][i] == 0) {
             // Trouver une ligne en dessous de i avec un 1 dans la colonne i et échanger
             for(j = i + 1; j < n; j++) {
-                if(augmented[j][i]) {
-                    bool* temp = augmented[i];
-                    augmented[i] = augmented[j];
-                    augmented[j] = temp;
+                if(B.elements[j][i]) {
+                    bool* temp = B.elements[i];
+                    B.elements[i] = B.elements[j];
+                    B.elements[j] = temp;
                     break;
                 }
             }
-            if(j == n) return NULL; // La matrice n'est pas inversible
+            if(j == n){
+                printf("[+] binary inversion impossible.\n");
+                return I; // La matrice n'est pas inversible
+            } 
         }
         // Chercher parmi les autres lignes celle qui ont un 1 dans la colonne
         for(j = 0; j < n; j++) {
-            if(i != j && augmented[j][i]) {
+            if(i != j && B.elements[j][i]) {
                 for(k = 0; k < 2 * n; k++) {
-                    augmented[j][k] ^= augmented[i][k]; // XOR avec la ligne i
+                    B.elements[j][k] ^= B.elements[i][k]; // XOR avec la ligne i
                 }
             }
         }
     }
 
     // Extraction de la matrice inverse
-    bool** inverse = allocateMatrix(n,0);
     for(i = 0; i < n; i++) {
         for(j = 0; j < n; j++) {
-            inverse[i][j] = augmented[i][j + n];
+            I.elements[i][j] = B.elements[i][j + n];
         }
     }
 
     // Libération de la mémoire de la matrice augmentée
-    for(i = 0; i < n; i++) {
-        free(augmented[i]);
-    }
-    free(augmented);
-
-    return inverse;
+    freeBinaryMatrix(B);
+    return I;
 }

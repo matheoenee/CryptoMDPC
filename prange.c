@@ -1,15 +1,17 @@
 #include "prange.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+
 #include "matrix.h"
 #include "binary_inverse.h"
 
 // Fonction pour choisir un ensemble d'information aléatoire
-int* randomInformationSet(int n, int k){
+Vector randomInformationSet(int n, int k){
     srand(time(NULL));
-    int* I = (int*)malloc((n-k) * sizeof(int));
+    Vector I = initVector(n-k);
     int *array = (int*)malloc(n * sizeof(int));
 
     // Remplir l'array avec les nombres de 1 à n
@@ -26,8 +28,8 @@ int* randomInformationSet(int n, int k){
     }
 
     // Sélectionner les premiers n-k éléments
-    for (int i = 0; i < (n-k); i++) {
-        I[i] = array[i];
+    for (int i = 0; i < I.size; i++) {
+        I.elements[i] = array[i];
     }
 
     free(array);
@@ -35,28 +37,39 @@ int* randomInformationSet(int n, int k){
 }
 
 // Fonction qui retourne sous-matrice de taille (n-k) de A dont les colonnes sont indexées par I
-bool** indexedMatrix(bool** A, int* I, int n, int k){
-    bool** AI = allocateMatrix(n-k, 0);
-    for(int i = 0; i < (n-k); i++){
-        for(int j = 0; j < (n-k); j++){
-            AI[i][j] = A[i][I[j]-1];
+BinaryMatrix indexedMatrix(BinaryMatrix A, Vector I, int n, int k){
+    BinaryMatrix AI = initBinaryMatrix(A.rows, A.rows);
+    for(int i = 0; i < A.rows; i++){
+        for(int j = 0; j < A.rows; j++){
+            AI.elements[i][j] = A.elements[i][I.elements[j]-1];
         }
     }
     return AI;
 }
 
+// Fonction qui retourne x de longeur n à partir de x de longueur n-k et I
+BinaryVector resizeBinaryVector(BinaryVector x, Vector I, int n){
+    BinaryVector u = initBinaryVector(n);
+    for(int i = 0; i < I.size; i++){
+        u.elements[I.elements[i]] = x.elements[i];
+    }
+    return u;
+}
+
 // Algorithme de Prange
-bool* Prange(bool** H, bool* s, int t, int n, int k){
-    bool* x = allocateVector(n-k);
+BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k){
+    BinaryVector x = initBinaryVector(H.rows);
+    Vector I = randomInformationSet(n,k);
     int w = 0;
     while(w != t){
-        int* I = randomInformationSet(n,k);
-        bool** HI = indexedMatrix(H, I, n, k);
-        bool** HII = binary_inverse(HI, n-k);
-        if(HII){
-            bool* x = matrixProduct(n-k, s, HII);
-            w = hammingWeight(x, n);
+        Vector I = randomInformationSet(n,k);
+        BinaryMatrix HI = indexedMatrix(H, I, n, k);
+        BinaryMatrix HII = binaryMatrixInverse(HI);
+        if(!isMatrixEmpty(HII)){
+            BinaryVector x = binaryMatrixVectorProduct(HII, s);
+            w = hammingWeight(x);
         }
     }
+    BinaryVector xx = resizeBinaryVector(x, I, n);
     return x;
 }

@@ -2,8 +2,9 @@
 #define BINARY_INVERSE_H
 
 #include <stdbool.h>
+#include "structures.h"
 
-// Fonction pour trouver l'inverse binaire d'une matrice carrée de taille n
-bool** binary_inverse(bool** A, int n);
+// Fonction pour calculer l'inverse d'une matrice binaire
+BinaryMatrix binaryMatrixInverse(BinaryMatrix A);
 
 #endif // BINARY_INVERSE_H

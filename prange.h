@@ -2,14 +2,18 @@
 #define PRANGE_H
 
 #include <stdbool.h>
+#include "structures.h"
 
 // Fonction pour choisir un ensemble d'information aléatoire
-int* randomInformationSet(int n, int k);
+Vector randomInformationSet(int n, int k);
 
 // Fonction qui retourne sous-matrice de taille (n-k) de A dont les colonnes sont indexées par I
-bool** indexedMatrix(bool** A, int* I, int n, int k);
+BinaryMatrix indexedMatrix(BinaryMatrix A, Vector I, int n, int k);
+
+// Fonction qui retourne x de longeur n à partir de x de longueur n-k et I
+BinaryVector resizeBinaryVector(BinaryVector x, Vector I, int n);
 
 // Algorithme de Prange
-bool* Prange(bool** H, bool* s, int t, int n, int k);
+BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k);
 
 #endif // PRANGE_H
