@@ -7,7 +7,7 @@
 #include "structures.h"
 #include "matrix.h"
 
-// Algortihme de comparaison d'odre 1
+// Algortihme de comparaison
 int max(int a,int b){
     if (a>b) return a;
     return b;

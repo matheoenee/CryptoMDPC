@@ -10,6 +10,15 @@ BinaryMatrix initBinaryMatrix(int rows, int cols);
 // Fonnction pour créer un vecteur binaire
 BinaryVector initBinaryVector(int n);
 
+// Pour entrer les valeurs d'un vecteur dans un autre
+BinaryVector copyBinaryVector(BinaryVector u);
+
+// Pour entrer les valeurs d'un vecteur dans un autre (déjà existant)
+void recopyBinaryVector(BinaryVector new, BinaryVector old);
+
+// Initialise un vecteur binaire avec un élément unique à 1
+BinaryVector initUnitVector(int size, int position);
+
 // Fonnction pour créer un vecteur
 Vector initVector(int n);
 
@@ -21,6 +30,12 @@ BinaryVector binaryMatrixVectorProduct(BinaryMatrix A, BinaryVector u);
 
 // Fonction pour le produit matriciel non modulaire (naive product syndrome x H in BitFlipping, order : n**3)
 Vector matrixVectorProduct(BinaryVector u, BinaryMatrix A);
+
+// Produit de vecteurs comme étant des polynômes
+BinaryVector binaryVectorProduct(BinaryVector u, BinaryVector v);
+
+// Fonction XOR de deux vecteurs
+BinaryVector addVectors(BinaryVector u, BinaryVector v);
 
 // Fonction pour calculer le poids de Hamming d'un vecteur binaire
 int hammingWeight(BinaryVector u);
@@ -42,5 +57,8 @@ void printBinaryVector(BinaryVector u);
 
 // Fonction qui renvoie si une matrice est vide ou non
 bool isMatrixEmpty(BinaryMatrix A);
+
+// Calcul de l'inverse d'un vecteur binaire modulo (x^n - 1)
+BinaryVector invertBinaryVector(BinaryVector v);
 
 #endif // MATRIX_H
