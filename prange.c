@@ -10,7 +10,7 @@
 
 // Fonction pour choisir un ensemble d'information aléatoire
 Vector randomInformationSet(int n, int k){
-    srand(time(NULL));
+    //srand(time(NULL));
     Vector I = initVector(n-k);
     int *array = (int*)malloc(n * sizeof(int));
 
@@ -37,7 +37,7 @@ Vector randomInformationSet(int n, int k){
 }
 
 // Fonction qui retourne sous-matrice de taille (n-k) de A dont les colonnes sont indexées par I
-BinaryMatrix indexedMatrix(BinaryMatrix A, Vector I, int n, int k){
+BinaryMatrix indexedMatrix(BinaryMatrix A, Vector I){
     BinaryMatrix AI = initBinaryMatrix(A.rows, A.rows);
     for(int i = 0; i < A.rows; i++){
         for(int j = 0; j < A.rows; j++){
@@ -51,7 +51,9 @@ BinaryMatrix indexedMatrix(BinaryMatrix A, Vector I, int n, int k){
 BinaryVector resizeBinaryVector(BinaryVector x, Vector I, int n){
     BinaryVector u = initBinaryVector(n);
     for(int i = 0; i < I.size; i++){
-        u.elements[I.elements[i]] = x.elements[i];
+        //printf("x[%d] = %d\n",i,x.elements[i]);
+        //printf("I[%d]-1 = %d\n",i,I.elements[i]-1);
+        u.elements[I.elements[i]-1] = x.elements[i];
     }
     return u;
 }
@@ -61,15 +63,37 @@ BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k){
     BinaryVector x = initBinaryVector(H.rows);
     Vector I = randomInformationSet(n,k);
     int w = 0;
-    while(w != t){
-        Vector I = randomInformationSet(n,k);
-        BinaryMatrix HI = indexedMatrix(H, I, n, k);
+    int count = 0;
+    while(w != t && count < 20){
+        printf("Prange [%d]\n", count);
+        I = randomInformationSet(n,k);
+        printf("I : \n");
+        printVector(I);
+        printf("\n");
+
+        BinaryMatrix HI = indexedMatrix(H, I);
+        printf("HI : \n");
+        printBinaryMatrix(HI);
+        printf("\n");
+
         BinaryMatrix HII = binaryMatrixInverse(HI);
+        printf("HII : \n");
+        printBinaryMatrix(HII);
+        printf("\n");
+
         if(!isMatrixEmpty(HII)){
             BinaryVector x = binaryMatrixVectorProduct(HII, s);
+            printf("x : \n");
+            printBinaryVector(x);
+            printf("\n");
             w = hammingWeight(x);
+            printf("w(x) = %d\n",w);
         }
+        count++;
     }
+    printf("I : \n");
+    printVector(I);
+    printf("\n");
     BinaryVector xx = resizeBinaryVector(x, I, n);
-    return x;
+    return xx;
 }

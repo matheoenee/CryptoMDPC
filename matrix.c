@@ -81,15 +81,16 @@ BinaryMatrix randomBinaryMatrix(int rows, int cols){
 
 // Fonction pour le produit matriciel d'une matrice binaire et d'un vecteur binaire (A.u)
 BinaryVector binaryMatrixVectorProduct(BinaryMatrix A, BinaryVector u){
-    int n = u.size;
+    int n = A.rows;
+    int m = A.cols;
     BinaryVector v = initBinaryVector(n);
-    if(A.cols != n){
+    if(m != u.size){
         printf("[+] binary product error, matrix (%d) and vector (%d) are wrong size.\n", A.cols, n);
         return v;
     }
     for(int i = 0; i < n; i++){
         int sum = 0;
-        for(int j = 0; j < n; j++){
+        for(int j = 0; j < m; j++){
             sum += A.elements[i][j] * u.elements[j];
         }
         v.elements[i] = sum;
@@ -183,6 +184,14 @@ void printBinaryMatrix(BinaryMatrix A){
 
 // Fonction pour afficher un vecteur binaire
 void printBinaryVector(BinaryVector u){
+    for(int i = 0; i < u.size; i++) {
+        printf("%d ", u.elements[i]);
+    }
+    printf("\n");
+}
+
+// Fonction pour afficher un vecteur binaire
+void printVector(Vector u){
     for(int i = 0; i < u.size; i++) {
         printf("%d ", u.elements[i]);
     }

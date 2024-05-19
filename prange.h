@@ -8,7 +8,7 @@
 Vector randomInformationSet(int n, int k);
 
 // Fonction qui retourne sous-matrice de taille (n-k) de A dont les colonnes sont indexées par I
-BinaryMatrix indexedMatrix(BinaryMatrix A, Vector I, int n, int k);
+BinaryMatrix indexedMatrix(BinaryMatrix A, Vector I);
 
 // Fonction qui retourne x de longeur n à partir de x de longueur n-k et I
 BinaryVector resizeBinaryVector(BinaryVector x, Vector I, int n);

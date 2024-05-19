@@ -55,6 +55,9 @@ void printBinaryMatrix(BinaryMatrix A);
 // Fonction pour afficher un vecteur binaire
 void printBinaryVector(BinaryVector u);
 
+// Fonction pour afficher un vecteur binaire
+void printVector(Vector u);
+
 // Fonction qui renvoie si une matrice est vide ou non
 bool isMatrixEmpty(BinaryMatrix A);
 

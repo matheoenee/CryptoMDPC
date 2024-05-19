@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "binary_inverse.h"
 #include "prange.h"
@@ -8,14 +9,50 @@
 #include "bitflipping.h"
 
 int main() {
-    int n = 8;
+    srand(time(NULL));
+    int n = 7;
+    int k = 5;
+    int t = 1;
+
+    /*BinaryMatrix H = randomBinaryMatrix(n-k, n);
+    printf("H : \n");
+    printBinaryMatrix(H);
+    printf("\n");*/
+    BinaryMatrix H = initBinaryMatrix(n-k, n);
+    H.elements[0][0] = 1; H.elements[0][1] = 0; H.elements[0][2] = 1; H.elements[0][3] = 0; H.elements[0][4] = 1; H.elements[0][5] = 0; H.elements[0][6] = 0;
+    H.elements[1][0] = 1; H.elements[1][1] = 0; H.elements[1][2] = 1; H.elements[1][3] = 1; H.elements[1][4] = 0; H.elements[1][5] = 0; H.elements[1][6] = 1;
+    printf("H : \n");
+    printBinaryMatrix(H);
+    printf("\n");
+
+    BinaryVector e = initBinaryVector(n);
+    e.elements[4] = 1;
+    printf("e : \n");
+    printBinaryVector(e);
+    printf("\n");
+
+    BinaryVector s = binaryMatrixVectorProduct(H,e);
+    printf("s : \n");
+    printBinaryVector(s);
+    printf("\n");
+
+    BinaryVector x = Prange(H,s,t,n,k);
+    printf("x : \n");
+    printBinaryVector(x);
+    printf("\n");
+
+    return 0;
+}
+
+/*
+int n = 8;
     BinaryVector h0 = initUnitVector(n, 1);
     printBinaryVector(h0);
     BinaryVector h0Inv = invertBinaryVector(h0);
     printBinaryVector(h0Inv);
 
     return 0;
-}
+*/
 
 /** test for bitflipping
 * BinaryVector h0 = initBinaryVector(n);
