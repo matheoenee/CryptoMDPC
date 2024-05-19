@@ -10,23 +10,21 @@
 
 int main() {
     srand(time(NULL));
-    int n = 7;
-    int k = 4;
-    int t = 1;
+    int n = 400;
+    int k = 200;
+    int t = 20;
 
     BinaryMatrix H = randomBinaryMatrix(n-k, n);
     /*BinaryMatrix H = initBinaryMatrix(n-k, n);
     H.elements[0][0] = 1; H.elements[0][1] = 0; H.elements[0][2] = 1; H.elements[0][3] = 0; H.elements[0][4] = 1; H.elements[0][5] = 0; H.elements[0][6] = 0;
     H.elements[1][0] = 1; H.elements[1][1] = 0; H.elements[1][2] = 1; H.elements[1][3] = 1; H.elements[1][4] = 0; H.elements[1][5] = 0; H.elements[1][6] = 1;*/
-    printf("H : \n");
-    printBinaryMatrix(H);
-    printf("\n");
 
-    BinaryVector e = initBinaryVector(n);
-    e.elements[4] = 1;
+
+    BinaryVector e = randomBinaryVectorHW(n,t);
     printf("e : \n");
     printBinaryVector(e);
     printf("\n");
+    printf("w(e) = %d\n",hammingWeight(e));
 
     BinaryVector s = binaryMatrixVectorProduct(H,e);
     printf("s : \n");

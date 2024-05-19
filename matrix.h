@@ -25,6 +25,9 @@ Vector initVector(int n);
 // Fonction pour créer une matrice binaire aléatoire 
 BinaryMatrix randomBinaryMatrix(int rows, int cols);
 
+// Fonction pour créer un vecteur binaire aléatoire de taille n et de poids t
+BinaryVector randomBinaryVectorHW(int n, int t);
+
 // Fonction pour le produit matriciel d'une matrice binaire et d'un vecteur binaire (A.u)
 BinaryVector binaryMatrixVectorProduct(BinaryMatrix A, BinaryVector u);
 

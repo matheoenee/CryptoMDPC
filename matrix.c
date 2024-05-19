@@ -79,6 +79,31 @@ BinaryMatrix randomBinaryMatrix(int rows, int cols){
     return A;
 }
 
+// Fonction pour créer un vecteur binaire aléatoire de taille n et de poids t
+BinaryVector randomBinaryVectorHW(int n, int t){
+    BinaryVector r = initBinaryVector(n);
+    // Initialiser un tableau d'index
+    int *indices = (int*)malloc(r.size * sizeof(int));
+    for (int i = 0; i < r.size; i++) {
+        indices[i] = i;
+    }
+
+    // Mélanger le tableau d'index avec l'algorithme de Fisher-Yates
+    for (int i = r.size - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int temp = indices[i];
+        indices[i] = indices[j];
+        indices[j] = temp;
+    }
+
+    // Placer t "1" dans les premières t positions du tableau mélangé
+    for (int i = 0; i < t; i++) {
+        r.elements[indices[i]] = 1;
+    }
+    free(indices);
+    return r;
+}
+
 // Fonction pour le produit matriciel d'une matrice binaire et d'un vecteur binaire (A.u)
 BinaryVector binaryMatrixVectorProduct(BinaryMatrix A, BinaryVector u){
     int n = A.rows;
@@ -89,9 +114,9 @@ BinaryVector binaryMatrixVectorProduct(BinaryMatrix A, BinaryVector u){
         return v;
     }
     for(int i = 0; i < n; i++){
-        int sum = 0;
+        bool sum = 0;
         for(int j = 0; j < m; j++){
-            sum += A.elements[i][j] * u.elements[j];
+            sum ^= (A.elements[i][j] && u.elements[j]);
         }
         v.elements[i] = sum;
     }

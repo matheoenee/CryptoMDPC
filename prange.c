@@ -71,7 +71,7 @@ BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k){
     Vector I = randomInformationSet(n,k);
     int w = 0;
     int count = 0;
-    while(w != t || count < 20){
+    while(w != t && count < 10){
         printf("Prange [%d]\n", count);
         I = randomInformationSet(n,k);
         /*printf("I : \n");
