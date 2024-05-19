@@ -11,16 +11,13 @@
 int main() {
     srand(time(NULL));
     int n = 7;
-    int k = 5;
+    int k = 4;
     int t = 1;
 
-    /*BinaryMatrix H = randomBinaryMatrix(n-k, n);
-    printf("H : \n");
-    printBinaryMatrix(H);
-    printf("\n");*/
-    BinaryMatrix H = initBinaryMatrix(n-k, n);
+    BinaryMatrix H = randomBinaryMatrix(n-k, n);
+    /*BinaryMatrix H = initBinaryMatrix(n-k, n);
     H.elements[0][0] = 1; H.elements[0][1] = 0; H.elements[0][2] = 1; H.elements[0][3] = 0; H.elements[0][4] = 1; H.elements[0][5] = 0; H.elements[0][6] = 0;
-    H.elements[1][0] = 1; H.elements[1][1] = 0; H.elements[1][2] = 1; H.elements[1][3] = 1; H.elements[1][4] = 0; H.elements[1][5] = 0; H.elements[1][6] = 1;
+    H.elements[1][0] = 1; H.elements[1][1] = 0; H.elements[1][2] = 1; H.elements[1][3] = 1; H.elements[1][4] = 0; H.elements[1][5] = 0; H.elements[1][6] = 1;*/
     printf("H : \n");
     printBinaryMatrix(H);
     printf("\n");

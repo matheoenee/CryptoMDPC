@@ -49,6 +49,13 @@ BinaryMatrix indexedMatrix(BinaryMatrix A, Vector I){
 
 // Fonction qui retourne x de longeur n à partir de x de longueur n-k et I
 BinaryVector resizeBinaryVector(BinaryVector x, Vector I, int n){
+    printf("I : \n");
+    printVector(I);
+    printf("\n");
+
+    printf("x : \n");
+    printBinaryVector(x);
+    printf("\n");
     BinaryVector u = initBinaryVector(n);
     for(int i = 0; i < I.size; i++){
         //printf("x[%d] = %d\n",i,x.elements[i]);
@@ -64,36 +71,33 @@ BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k){
     Vector I = randomInformationSet(n,k);
     int w = 0;
     int count = 0;
-    while(w != t && count < 20){
+    while(w != t || count < 20){
         printf("Prange [%d]\n", count);
         I = randomInformationSet(n,k);
-        printf("I : \n");
+        /*printf("I : \n");
         printVector(I);
-        printf("\n");
+        printf("\n");*/
 
         BinaryMatrix HI = indexedMatrix(H, I);
-        printf("HI : \n");
+        /*printf("HI : \n");
         printBinaryMatrix(HI);
-        printf("\n");
+        printf("\n");*/
 
         BinaryMatrix HII = binaryMatrixInverse(HI);
-        printf("HII : \n");
+        /*printf("HII : \n");
         printBinaryMatrix(HII);
-        printf("\n");
+        printf("\n");*/
 
         if(!isMatrixEmpty(HII)){
-            BinaryVector x = binaryMatrixVectorProduct(HII, s);
-            printf("x : \n");
+            x = binaryMatrixVectorProduct(HII, s);
+            /*printf("x : \n");
             printBinaryVector(x);
-            printf("\n");
+            printf("\n");*/
             w = hammingWeight(x);
-            printf("w(x) = %d\n",w);
+            //printf("w(x) = %d\n",w);
         }
         count++;
     }
-    printf("I : \n");
-    printVector(I);
-    printf("\n");
     BinaryVector xx = resizeBinaryVector(x, I, n);
     return xx;
 }
