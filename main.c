@@ -36,6 +36,11 @@ int main() {
     printBinaryVector(x);
     printf("\n");
 
+    BinaryVector ss = binaryMatrixVectorProduct(H, x);
+    printf("ss : \n");
+    printBinaryVector(ss);
+    printf("\n");
+
     return 0;
 }
 

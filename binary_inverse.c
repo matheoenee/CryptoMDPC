@@ -15,7 +15,7 @@ BinaryMatrix binaryMatrixInverse(BinaryMatrix A) {
     // Tester si la matrice est bien carré, sinon renvoyer une matrice vide
     BinaryMatrix I = initBinaryMatrix(n,n);
     if (A.cols != n){
-        printf("[+] binary inversion impossible.\n");
+        //printf("[+] binary inversion impossible.\n");
         return I;
     }
 
@@ -43,7 +43,7 @@ BinaryMatrix binaryMatrixInverse(BinaryMatrix A) {
                 }
             }
             if(j == n){
-                printf("[+] binary inversion impossible.\n");
+                //printf("[+] binary inversion impossible.\n");
                 return I; // La matrice n'est pas inversible
             } 
         }
