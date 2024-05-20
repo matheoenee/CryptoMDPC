@@ -57,14 +57,13 @@ BinaryVector resizeBinaryVector(BinaryVector x, Vector I, int n){
 
 // Algorithme de Prange
 BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k){
-    BinaryVector x; // Résultat HII*s (taille n-k)
-    BinaryVector xx; // Résultat x redimensionné à la taille n
     Vector I; // Ensemble d'Information
     BinaryMatrix HI; // Matrice Indexée par I
     BinaryMatrix HII; // Matrice inverse de HI
+    BinaryVector x; // Résultat de HII*s (taille n-k)
+    BinaryVector xx; // x redimensionné à la taille n
     int w = 0;
-    int count = 0;
-    while(w != t || count < 10){
+    while(w != t){
         I = randomInformationSet(n,k);
         HI = indexedMatrix(H, I);
         HII = binaryMatrixInverse(HI);
@@ -78,7 +77,6 @@ BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k){
         freeVector(I);
         freeBinaryMatrix(HI);
         freeBinaryMatrix(HII);
-        count++;
     }
     return xx;
 }

@@ -6,6 +6,7 @@
         "stdio.h": "c",
         "binary_inverse.h": "c",
         "matrix.h": "c",
-        "bitflipping.h": "c"
+        "bitflipping.h": "c",
+        "prange.h": "c"
     }
 }

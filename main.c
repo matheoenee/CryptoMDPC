@@ -16,7 +16,7 @@ int main() {
 
     int n = 400;
     int k = 200;
-    int t = 15;
+    int t = 20;
 
     printf("Paramètres : (n = %d, k = %d, t = %d)\n",n,k,t);
     printf("[+] Génération d'une matrice H aléatoire...\n");
