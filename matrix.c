@@ -14,6 +14,9 @@ BinaryMatrix initBinaryMatrix(int rows, int cols){
     bool** elements = (bool**)malloc(rows * sizeof(bool*));
     for(int i = 0; i < rows; i++){
         elements[i] = (bool*)malloc(cols * sizeof(bool));
+        for(int j = 0; j < cols; j++){
+            elements[i][j] = 0;
+        }
     }
     A.elements = elements;
     return A;
@@ -24,6 +27,9 @@ BinaryVector initBinaryVector(int size){
     BinaryVector u;
     u.size = size;
     bool* elements = (bool*)malloc(size * sizeof(bool*));
+    for (int i = 0; i < size; i++) {
+        elements[i] = 0;
+    }
     u.elements = elements;
     return u;
 }
@@ -63,6 +69,9 @@ Vector initVector(int size){
     Vector u;
     u.size = size;
     int* elements = (int*)malloc(size * sizeof(int*));
+    for (int i = 0; i < size; i++) {
+        elements[i] = 0;
+    }
     u.elements = elements;
     return u;
 }

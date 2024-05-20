@@ -10,9 +10,9 @@
 
 int main() {
     srand(time(NULL));
-    int n = 400;
-    int k = 200;
-    int t = 20;
+    int n = 200;
+    int k = 100;
+    int t = 10;
 
     BinaryMatrix H = randomBinaryMatrix(n-k, n);
     /*BinaryMatrix H = initBinaryMatrix(n-k, n);
@@ -40,6 +40,12 @@ int main() {
     printf("ss : \n");
     printBinaryVector(ss);
     printf("\n");
+
+    freeBinaryMatrix(H);
+    freeBinaryVector(e);
+    freeBinaryVector(s);
+    freeBinaryVector(x);
+    freeBinaryVector(ss);
 
     return 0;
 }
