@@ -242,6 +242,15 @@ bool isMatrixEmpty(BinaryMatrix A){
     return true;
 }
 
+// Fonction pour comparer deux vecteurs binaires
+bool areBinaryVectorEqual(BinaryVector u, BinaryVector v){
+    if(u.size != v.size) return false;
+    for(int i = 0; i < u.size; i++){
+        if(u.elements[i] != v.elements[i]) return false;
+    }
+    return true;
+}
+
 // Calcul de l'inverse d'un vecteur binaire modulo (x^n - 1)
 BinaryVector invertBinaryVector(BinaryVector v) {
     int n = v.size;

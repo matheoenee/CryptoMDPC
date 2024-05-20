@@ -10,52 +10,96 @@
 
 int main() {
     srand(time(NULL));
-    int n = 200;
-    int k = 100;
-    int t = 10;
 
+    clock_t start, end;
+    double cpu_time_used;
+
+    int n = 400;
+    int k = 200;
+    int t = 15;
+
+    printf("Paramètres : (n = %d, k = %d, t = %d)\n",n,k,t);
+    printf("[+] Génération d'une matrice H aléatoire...\n");
     BinaryMatrix H = randomBinaryMatrix(n-k, n);
-    /*BinaryMatrix H = initBinaryMatrix(n-k, n);
-    H.elements[0][0] = 1; H.elements[0][1] = 0; H.elements[0][2] = 1; H.elements[0][3] = 0; H.elements[0][4] = 1; H.elements[0][5] = 0; H.elements[0][6] = 0;
-    H.elements[1][0] = 1; H.elements[1][1] = 0; H.elements[1][2] = 1; H.elements[1][3] = 1; H.elements[1][4] = 0; H.elements[1][5] = 0; H.elements[1][6] = 1;*/
 
-
+    printf("[+] Génération d'une vecteur erreur aléatoire...\n");
     BinaryVector e = randomBinaryVectorHW(n,t);
-    printf("e : \n");
+    printf("Erreur e : \n");
     printBinaryVector(e);
-    printf("\n");
-    printf("w(e) = %d\n",hammingWeight(e));
+    printf("HW(e) = %d\n",hammingWeight(e));
 
+    printf("[+] Calcul du syndrome...\n");
     BinaryVector s = binaryMatrixVectorProduct(H,e);
-    printf("s : \n");
+    printf("Syndrome s : \n");
     printBinaryVector(s);
     printf("\n");
 
+    printf("[+] Début de l'algorithme de Prange...\n");
+    start = clock();
     BinaryVector x = Prange(H,s,t,n,k);
-    printf("x : \n");
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("[info] Temps d'éxecution : %f secondes.\n", cpu_time_used);
+    printf("Résultat x : \n");
     printBinaryVector(x);
     printf("\n");
 
-    BinaryVector ss = binaryMatrixVectorProduct(H, x);
-    printf("ss : \n");
-    printBinaryVector(ss);
-    printf("\n");
+    printf("Vérification...\n");
+    if(areBinaryVectorEqual(e,x)) printf("x == e\n");
+    else printf("x != e\n");
 
     freeBinaryMatrix(H);
     freeBinaryVector(e);
     freeBinaryVector(s);
     freeBinaryVector(x);
-    freeBinaryVector(ss);
 
     return 0;
 }
 
-/*
-int n = 8;
-    BinaryVector h0 = initUnitVector(n, 1);
-    printBinaryVector(h0);
-    BinaryVector h0Inv = invertBinaryVector(h0);
-    printBinaryVector(h0Inv);
+/* TEST PRANGE
+srand(time(NULL));
+
+    clock_t start, end;
+    double cpu_time_used;
+
+    int n = 300;
+    int k = 150;
+    int t = 15;
+
+    printf("Paramètres : (n = %d, k = %d, t = %d)\n",n,k,t);
+    printf("[+] Génération d'une matrice H aléatoire...\n");
+    BinaryMatrix H = randomBinaryMatrix(n-k, n);
+
+    printf("[+] Génération d'une vecteur erreur aléatoire...\n");
+    BinaryVector e = randomBinaryVectorHW(n,t);
+    printf("Erreur e : \n");
+    printBinaryVector(e);
+    printf("HW(e) = %d\n",hammingWeight(e));
+
+    printf("[+] Calcul du syndrome...\n");
+    BinaryVector s = binaryMatrixVectorProduct(H,e);
+    printf("Syndrome s : \n");
+    printBinaryVector(s);
+    printf("\n");
+
+    printf("[+] Début de l'algorithme de Prange...\n");
+    start = clock();
+    BinaryVector x = Prange(H,s,t,n,k);
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("[info] Temps d'éxecution : %f secondes.\n", cpu_time_used);
+    printf("Résultat x : \n");
+    printBinaryVector(x);
+    printf("\n");
+
+    printf("Vérification...\n");
+    if(areBinaryVectorEqual(e,x)) printf("x == e\n");
+    else printf("x != e\n");
+
+    freeBinaryMatrix(H);
+    freeBinaryVector(e);
+    freeBinaryVector(s);
+    freeBinaryVector(x);
 
     return 0;
 */

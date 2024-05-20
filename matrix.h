@@ -64,6 +64,9 @@ void printVector(Vector u);
 // Fonction qui renvoie si une matrice est vide ou non
 bool isMatrixEmpty(BinaryMatrix A);
 
+// Fonction pour comparer deux vecteurs binaires
+bool areBinaryVectorEqual(BinaryVector u, BinaryVector v);
+
 // Calcul de l'inverse d'un vecteur binaire modulo (x^n - 1)
 BinaryVector invertBinaryVector(BinaryVector v);
 

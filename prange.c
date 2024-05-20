@@ -10,7 +10,6 @@
 
 // Fonction pour choisir un ensemble d'information aléatoire
 Vector randomInformationSet(int n, int k){
-    //srand(time(NULL));
     Vector I = initVector(n-k);
     int *array = (int*)malloc(n * sizeof(int));
 
@@ -58,42 +57,28 @@ BinaryVector resizeBinaryVector(BinaryVector x, Vector I, int n){
 
 // Algorithme de Prange
 BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k){
-    BinaryVector x = initBinaryVector(H.rows);
-    BinaryMatrix HI;
-    BinaryMatrix HII;
-    Vector I = randomInformationSet(n,k);
+    BinaryVector x; // Résultat HII*s (taille n-k)
+    BinaryVector xx; // Résultat x redimensionné à la taille n
+    Vector I; // Ensemble d'Information
+    BinaryMatrix HI; // Matrice Indexée par I
+    BinaryMatrix HII; // Matrice inverse de HI
     int w = 0;
     int count = 0;
     while(w != t || count < 10){
-        //printf("Prange [%d]\n", count);
         I = randomInformationSet(n,k);
-        /*printf("I : \n");
-        printVector(I);
-        printf("\n");*/
-
         HI = indexedMatrix(H, I);
-        /*printf("HI : \n");
-        printBinaryMatrix(HI);
-        printf("\n");*/
-
         HII = binaryMatrixInverse(HI);
-        /*printf("HII : \n");
-        printBinaryMatrix(HII);
-        printf("\n");*/
-
         if(!isMatrixEmpty(HII)){
             x = binaryMatrixVectorProduct(HII, s);
-            /*printf("x : \n");
-            printBinaryVector(x);
-            printf("\n");*/
             w = hammingWeight(x);
-            //printf("w(x) = %d\n",w);
+            xx = resizeBinaryVector(x, I, n);
+            freeBinaryVector(x);
         }
+        // Libérer la mémoire allouée pour I, HI, et HII à chaque itération
+        freeVector(I);
+        freeBinaryMatrix(HI);
+        freeBinaryMatrix(HII);
         count++;
     }
-    BinaryVector xx = resizeBinaryVector(x, I, n);
-    freeVector(I);
-    freeBinaryMatrix(HI);
-    freeBinaryMatrix(HII);
     return xx;
 }

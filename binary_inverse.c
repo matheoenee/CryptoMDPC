@@ -11,13 +11,10 @@
 BinaryMatrix binaryMatrixInverse(BinaryMatrix A) {
     int i, j, k;
     int n = A.rows;
-
-    // Tester si la matrice est bien carré, sinon renvoyer une matrice vide
     BinaryMatrix I = initBinaryMatrix(n,n);
-    if (A.cols != n){
-        //printf("[+] binary inversion impossible.\n");
-        return I;
-    }
+
+    // Tester si la matrice est bien carrée, sinon renvoyer une matrice vide
+    if (A.cols != n) return I;
 
     // Allocation de la matrice augmentée
     BinaryMatrix B = initBinaryMatrix(n,2*n);
@@ -42,10 +39,7 @@ BinaryMatrix binaryMatrixInverse(BinaryMatrix A) {
                     break;
                 }
             }
-            if(j == n){
-                //printf("[+] binary inversion impossible.\n");
-                return I; // La matrice n'est pas inversible
-            } 
+            if(j == n) return I; // La matrice n'est pas inversible
         }
         // Chercher parmi les autres lignes celle qui ont un 1 dans la colonne
         for(j = 0; j < n; j++) {
