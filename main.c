@@ -144,8 +144,8 @@ srand(time(NULL));
     return 0;
 */
 
-/** test for bitflipping
-* BinaryVector h0 = initBinaryVector(n);
+/* TEST BITFLIPPING
+    BinaryVector h0 = initBinaryVector(n);
     h0.elements[1] = true;
     h0.elements[3] = true;
     h0.elements[4] = true;
