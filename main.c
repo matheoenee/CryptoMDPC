@@ -8,59 +8,65 @@
 #include "matrix.h"
 #include "bitflipping.h"
 
+// Utilisez les valeurs passées par le préprocesseur pour n, k, et t
+#ifndef PARAM_N
+#define PARAM_N 200
+#endif
+
+#ifndef PARAM_K
+#define PARAM_K 100
+#endif
+
+#ifndef PARAM_T
+#define PARAM_T 10
+#endif
+
 int main() {
     srand(time(NULL));
 
     clock_t start, end;
     double cpu_time_used;
-    double sum_time = 0;
 
-    int n = 200;
-    int k = 100;
-    int t = 10;
+    int n = PARAM_N;
+    int k = PARAM_K;
+    int t = PARAM_T;
 
-    int loop = 100;
+    int loop = 1000;
+    int inv_count = 0;
+    double time_inv = 0;
 
+    BinaryMatrix H, HI;
 
     printf("Paramètres : (n = %d, k = %d, t = %d)\n",n,k,t);
-    for(int i = 0; i < loop; i++){
-        printf("[loop %02d]\n",i);
-        BinaryMatrix H = randomBinaryMatrix(n-k, n);
-        BinaryVector e = randomBinaryVectorHW(n,t);
-        BinaryVector s = binaryMatrixVectorProduct(H,e);
 
+    for(int i = 0; i < loop; i++){
+        H = randomBinaryMatrix(n-k, n-k);
         start = clock();
-        BinaryVector x = Prange(H,s,t,n,k);
+        HI = binaryMatrixInverse(H);
         end = clock();
         cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-        printf("    Temps d'éxecution : %f secondes.\n", cpu_time_used);
-        sum_time += cpu_time_used;
-
-        printf("    Vérification...");
-        if(areBinaryVectorEqual(e,x)) printf("[OK] x == e\n");
-        else printf("[NOK] x != e\n");
-
-        freeBinaryMatrix(H);
-        freeBinaryVector(s);
-        freeBinaryVector(e);
-        freeBinaryVector(x);
+        if(!isMatrixEmpty(HI)){
+            time_inv += cpu_time_used;
+            inv_count++;
+        }
     }
+    printf("[+] %d inversions sur %d en %f secondes de moyennes.\n",inv_count, loop, time_inv/inv_count);
     
-    double avg_time = sum_time/loop;
-    printf("Temps d'éxecution moyen : %f secondes.\n", avg_time);
+    freeBinaryMatrix(H);
+    freeBinaryMatrix(HI);
 
     return 0;
 }
 
 /* TEST PRANGE 01 
-srand(time(NULL));
+    srand(time(NULL));
 
     clock_t start, end;
     double cpu_time_used;
 
-    int n = 300;
-    int k = 150;
-    int t = 15;
+    int n = PARAM_N;
+    int k = PARAM_K;
+    int t = PARAM_T;
 
     printf("Paramètres : (n = %d, k = %d, t = %d)\n",n,k,t);
     printf("[+] Génération d'une matrice H aléatoire...\n");
@@ -78,7 +84,6 @@ srand(time(NULL));
     printBinaryVector(s);
     printf("\n");
 
-    printf("[+] Début de l'algorithme de Prange...\n");
     start = clock();
     BinaryVector x = Prange(H,s,t,n,k);
     end = clock();
@@ -140,6 +145,43 @@ srand(time(NULL));
     
     double avg_time = sum_time/loop;
     printf("Temps d'éxecution moyen : %f secondes.\n", avg_time);
+
+    return 0;
+*/
+
+/* ESTIMATION TEMPS INVERSION
+srand(time(NULL));
+
+    clock_t start, end;
+    double cpu_time_used;
+
+    int n = PARAM_N;
+    int k = PARAM_K;
+    int t = PARAM_T;
+
+    int loop = 1000;
+    int inv_count = 0;
+    double time_inv = 0;
+
+    BinaryMatrix H, HI;
+
+    printf("Paramètres : (n = %d, k = %d, t = %d)\n",n,k,t);
+
+    for(int i = 0; i < loop; i++){
+        H = randomBinaryMatrix(n-k, n-k);
+        start = clock();
+        HI = binaryMatrixInverse(H);
+        end = clock();
+        cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+        if(!isMatrixEmpty(HI)){
+            time_inv += cpu_time_used;
+            inv_count++;
+        }
+    }
+    printf("[+] %d inversions sur %d en %f secondes de moyennes.\n",inv_count, loop, time_inv/inv_count);
+    
+    freeBinaryMatrix(H);
+    freeBinaryMatrix(HI);
 
     return 0;
 */

@@ -78,7 +78,6 @@ Vector initVector(int size){
 
 // Fonction pour créer une matrice binaire aléatoire 
 BinaryMatrix randomBinaryMatrix(int rows, int cols){
-    srand(time(NULL));
     BinaryMatrix A = initBinaryMatrix(rows,cols);
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < cols; j++) {

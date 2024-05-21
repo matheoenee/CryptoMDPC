@@ -57,12 +57,15 @@ BinaryVector resizeBinaryVector(BinaryVector x, Vector I, int n){
 
 // Algorithme de Prange
 BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k){
+    printf("[+] Début de l'algorithme de Prange...\n");
     Vector I; // Ensemble d'Information
     BinaryMatrix HI; // Matrice Indexée par I
     BinaryMatrix HII; // Matrice inverse de HI
     BinaryVector x; // Résultat de HII*s (taille n-k)
     BinaryVector xx; // x redimensionné à la taille n
     int w = 0;
+    int inv_count = 0;
+    int loop_count = 0;
     while(w != t){
         I = randomInformationSet(n,k);
         HI = indexedMatrix(H, I);
@@ -72,11 +75,16 @@ BinaryVector Prange(BinaryMatrix H, BinaryVector s, int t, int n, int k){
             w = hammingWeight(x);
             xx = resizeBinaryVector(x, I, n);
             freeBinaryVector(x);
+            inv_count++;
         }
         // Libérer la mémoire allouée pour I, HI, et HII à chaque itération
         freeVector(I);
         freeBinaryMatrix(HI);
         freeBinaryMatrix(HII);
+        loop_count++;
     }
+    printf("[+] %d tours réalisés.\n",loop_count);
+    printf("[+] %d inversions réalisées.\n",inv_count);
+    printf("[+] Fin de l'algorithme de Prange.\n");
     return xx;
 }
