@@ -31,29 +31,39 @@ int main() {
     int k = PARAM_K;
     int t = PARAM_T;
 
-    int loop = 1000;
-    int inv_count = 0;
-    double time_inv = 0;
-
-    BinaryMatrix H, HI;
-
     printf("Paramètres : (n = %d, k = %d, t = %d)\n",n,k,t);
+    printf("[+] Génération d'une matrice H aléatoire...\n");
+    BinaryMatrix H = randomBinaryMatrix(n-k, n);
 
-    for(int i = 0; i < loop; i++){
-        H = randomBinaryMatrix(n-k, n-k);
-        start = clock();
-        HI = binaryMatrixInverse(H);
-        end = clock();
-        cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-        if(!isMatrixEmpty(HI)){
-            time_inv += cpu_time_used;
-            inv_count++;
-        }
-    }
-    printf("[+] %d inversions sur %d en %f secondes de moyennes.\n",inv_count, loop, time_inv/inv_count);
-    
+    printf("[+] Génération d'une vecteur erreur aléatoire...\n");
+    BinaryVector e = randomBinaryVectorHW(n,t);
+    printf("Erreur e : \n");
+    printBinaryVector(e);
+    printf("HW(e) = %d\n",hammingWeight(e));
+
+    printf("[+] Calcul du syndrome...\n");
+    BinaryVector s = binaryMatrixVectorProduct(H,e);
+    printf("Syndrome s : \n");
+    printBinaryVector(s);
+    printf("\n");
+
+    start = clock();
+    BinaryVector x = Prange(H,s,t,n,k);
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("[info] Temps d'éxecution : %f secondes.\n", cpu_time_used);
+    printf("Résultat x : \n");
+    printBinaryVector(x);
+    printf("\n");
+
+    printf("Vérification...\n");
+    if(areBinaryVectorEqual(e,x)) printf("x == e\n");
+    else printf("x != e\n");
+
     freeBinaryMatrix(H);
-    freeBinaryMatrix(HI);
+    freeBinaryVector(e);
+    freeBinaryVector(s);
+    freeBinaryVector(x);
 
     return 0;
 }
@@ -116,7 +126,7 @@ srand(time(NULL));
     int k = 100;
     int t = 10;
 
-    int loop = 100;
+    int loop = 1000;
 
 
     printf("Paramètres : (n = %d, k = %d, t = %d)\n",n,k,t);
@@ -150,7 +160,7 @@ srand(time(NULL));
 */
 
 /* ESTIMATION TEMPS INVERSION
-srand(time(NULL));
+    srand(time(NULL));
 
     clock_t start, end;
     double cpu_time_used;
