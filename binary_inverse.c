@@ -39,9 +39,12 @@ BinaryMatrix binaryMatrixInverse(BinaryMatrix A) {
                     break;
                 }
             }
-            if(j == n) return I; // La matrice n'est pas inversible
+            if(j == n){ // La matrice n'est pas inversible
+                freeBinaryMatrix(B);
+                return I; 
+            } 
         }
-        // Chercher parmi les autres lignes celle qui ont un 1 dans la colonne
+        // Chercher parmi les autres lignes celles qui ont un 1 dans la colonne
         for(j = 0; j < n; j++) {
             if(i != j && B.elements[j][i]) {
                 for(k = 0; k < 2 * n; k++) {
