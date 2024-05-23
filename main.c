@@ -22,46 +22,46 @@
 #endif
 
 int main() {
-    BinaryVector h0 = initBinaryVector(8);
-    h0.elements[1] = true;
-    h0.elements[3] = true;
-    h0.elements[4] = true;
-    h0.elements[6] = true;
-    BinaryVector h1 = initBinaryVector(8);
-    h1.elements[0] = true;
-    h1.elements[1] = true;
-    h1.elements[5] = true;
-    h1.elements[7] = true;
+    int n = 1000; // le nombre de tests
+    int size = 64;
+    int w = 23;
+    int t = 3;
+    int good =0;
+    for(int i=0; i<n; i++){
+        BinaryVector h0 = randomBinaryVectorHW(size, w);
+        BinaryVector h1 = randomBinaryVectorHW(size, w);
+        BinaryVector e0 = randomBinaryVectorHW(size, t);
+        BinaryVector e1 = randomBinaryVectorHW(size, w);
+        BinaryVector e = initBinaryVector(size);
+        for(int l=0; l<size; l++){
+            e.elements[i] = e0.elements[i];
+            e.elements[i+size] = e1.elements[i];
+        }
+        BinaryVector s0 = binaryVectorProduct(h0, e0);
+        BinaryVector s1 = binaryVectorProduct(h1, e1);
+        BinaryVector s = initBinaryVector(size);
+        addBinaryVectors(s, s0, s1);
 
-    BinaryVector e0 = initUnitVector(8, 3);
-    BinaryVector e1 = initUnitVector(8, 7);
+        BinaryVector output = BitFlipping(h0,h1, s, 5, t);
+        if(areBinaryVectorEqual(output, e)){
+            printf("algorithm sucess");
+            good+=1;
+        }
+        printf("end of round %d", i);
+        freeBinaryVector(h0);
+        freeBinaryVector(h1);
+        freeBinaryVector(e0);
+        freeBinaryVector(e1);
+        freeBinaryVector(e0);
+        freeBinaryVector(e);
+        freeBinaryVector(s0);
+        freeBinaryVector(s1);
+        freeBinaryVector(s);
+        freeBinaryVector(output);
+    }
 
-    BinaryVector s0 = binaryVectorProduct(h0, e0);
-    BinaryVector s1 = binaryVectorProduct(h1, e1);
+    printf("number of sucess : %d/%d\n", good, n);
 
-    printBinaryVector(h0);
-    printf("\n");
-    printBinaryVector(s0);
-    printf("\n");
-    printBinaryVector(h1);
-    printf("\n");
-    printBinaryVector(s1);
-    printf("\n");
-
-    BinaryVector s = initBinaryVector(8);
-    addBinaryVectors(s, s0, s1);
-
-    BinaryVector e = BitFlipping(h0, h1, s, , 1);
-
-    printBinaryVector(e);
-    freeBinaryVector(e);
-    freeBinaryVector(s);
-    freeBinaryVector(s0);
-    freeBinaryVector(s1);
-    freeBinaryVector(h0);
-    freeBinaryVector(h1);
-    freeBinaryVector(e0);
-    freeBinaryVector(e1);
     return 0;
 }
 
