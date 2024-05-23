@@ -38,7 +38,10 @@ Vector matrixVectorProduct(BinaryVector u, BinaryMatrix A);
 BinaryVector binaryVectorProduct(BinaryVector u, BinaryVector v);
 
 // Fonction XOR de deux vecteurs
-BinaryVector addVectors(BinaryVector u, BinaryVector v);
+void addBinaryVectors(BinaryVector sum, BinaryVector u, BinaryVector v);
+
+//Multiplication par x**shift modulo x**n+1
+BinaryVector shiftVector(BinaryVector u, int shift);
 
 // Fonction pour calculer le poids de Hamming d'un vecteur binaire
 int hammingWeight(BinaryVector u);
@@ -68,6 +71,6 @@ bool isMatrixEmpty(BinaryMatrix A);
 bool areBinaryVectorEqual(BinaryVector u, BinaryVector v);
 
 // Calcul de l'inverse d'un vecteur binaire modulo (x^n - 1)
-BinaryVector invertBinaryVector(BinaryVector v);
+BinaryVector invertBinaryVector(BinaryVector u);
 
 #endif // MATRIX_H

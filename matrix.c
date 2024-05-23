@@ -134,17 +134,15 @@ BinaryVector binaryMatrixVectorProduct(BinaryMatrix A, BinaryVector u){
 // Fonction pour le produit matriciel non modulaire, avec le vecteur à gauche
 Vector matrixVectorProduct(BinaryVector u, BinaryMatrix A){
     int n = u.size;
-    Vector v = initVector(n);
+    Vector v = initVector(2*n);
     if(A.rows != n){
         printf("[+] binary product error, %d-size vector and %d-rows matrix can't be multiplied together.,\n", n, A.rows);
         return v;
     }
-    for(int i = 0; i < n; i++){
-        int sum = 0;
-        for(int j = 0; j < n; j++){
-            if(A.elements[j][i] && u.elements[j]) sum += 1;
+    for(int j = 0; j < 2*n; j++){
+        for(int i = 0; i < n; i++){
+            if(A.elements[i][j] && u.elements[i]) v.elements[j] += 1;
         }
-        v.elements[i] = sum;
     }
     return v;
 }
@@ -158,24 +156,38 @@ BinaryVector binaryVectorProduct(BinaryVector u, BinaryVector v){
         return w;
     }
     for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-            w.elements[(i+j)%n] ^= (u.elements[i]^v.elements[j]);
+        if(v.elements[i]){
+            for(int j=0; j<n; j++){
+                w.elements[(i+j)%n] ^= u.elements[j];
+            }
         }
     }
     return w;
 }
 
 // Fonction XOR de deux vecteurs
-BinaryVector addVectors(BinaryVector u, BinaryVector v) {
-    BinaryVector w = initBinaryVector(u.size);
+void addBinaryVectors(BinaryVector sum, BinaryVector u, BinaryVector v) {
     if(v.size != u.size){
-        printf("[+] binary product error, %d-size vector and %d-vector can't be multiplied together.\n", v.size, u.size);
-        return w;
+        printf("[+] binary sum error, %d-size vector and %d-vector can't be added together.\n", v.size, u.size);
     }
     for (int i = 0; i < u.size; i++) {
-        w.elements[i] = u.elements[i] ^ v.elements[i];
+        sum.elements[i] = u.elements[i] ^ v.elements[i];
     }
-    return w;
+}
+
+//Multiplication par x**shift modulo x**n+1
+BinaryVector shiftVector(BinaryVector u, int shift){
+    BinaryVector v = initBinaryVector(u.size);
+    for(int i=0; i<v.size; i++){
+        v.elements[(i+shift)%v.size] = u.elements[i];
+    }
+    return v;
+}
+
+int binaryVectorDegree(BinaryVector u){
+    int i = u.size - 1;
+    while(!u.elements[i]){i--;}
+    return i;
 }
 
 // Fonction pour calculer le poids de Hamming d'un vecteur binaire
@@ -251,56 +263,86 @@ bool areBinaryVectorEqual(BinaryVector u, BinaryVector v){
 }
 
 // Calcul de l'inverse d'un vecteur binaire modulo (x^n - 1)
-BinaryVector invertBinaryVector(BinaryVector v) {
-    int n = v.size;
-    BinaryVector r0 = copyBinaryVector(v);
-    BinaryVector r1 = initUnitVector(n, 0);
-    BinaryVector s0 = initUnitVector(n, 0);
-    BinaryVector s1 = initUnitVector(n, 1);
-
-    while (true) {
-        int r0_degree = 0;
-        int r1_degree = 0;
-        for (int i = n-1; i >= 0; i--) {
-            if (r0.elements[i]) {
-                r0_degree = i;
-                break;
-            }
-        }
-        for (int i = n-1; i >= 0; i--) {
-            if (r1.elements[i]) {
-                r1_degree = i;
-                break;
-            }
-        }
-        if (r1_degree == 0 && r1.elements[0] == 0) {
-            break;
-        }
-        int shift = r0_degree - r1_degree;
-        if (shift < 0) {
-            BinaryVector tmp = initBinaryVector(r0.size);
-            recopyBinaryVector(tmp, r0);
-            recopyBinaryVector(r0, r1);
-            recopyBinaryVector(r1, tmp);
-            recopyBinaryVector(tmp, s0);
-            recopyBinaryVector(s0, s1);
-            recopyBinaryVector(s1, tmp);
-            shift = -shift;
-        }
-        BinaryVector r1_shifted = initUnitVector(n, shift);
-        r1_shifted = binaryVectorProduct(r1, r1_shifted);
-        r0 = addVectors(r0, r1_shifted);
-
-        BinaryVector s1_shifted = initUnitVector(n, shift);
-        s1_shifted = binaryVectorProduct(s1, s1_shifted);
-        s0 = addVectors(s0, s1_shifted);
-
-        freeBinaryVector(r1_shifted);
-        freeBinaryVector(s1_shifted);
+BinaryVector invertBinaryVector(BinaryVector vector) {
+    int n = vector.size;
+    BinaryVector r0 = initBinaryVector(vector.size);// =x^n-1
+    BinaryVector r1 = copyBinaryVector(vector);
+    BinaryVector r2 = initBinaryVector(n);
+    BinaryVector q = initBinaryVector(n);
+    /*
+    BinaryVector u = initBinaryVector(n);
+    BinaryVector v = initBinaryVector(n);
+    BinaryVector u0 = initUnitVector(n, 0);
+    BinaryVector u1 = initBinaryVector(n);
+    BinaryVector v0 = initBinaryVector(n);
+    BinaryVector v1 = initUnitVector(n,0);
+    */
+    //Division euclidienne de x^n+1 par u
+    int r1_degree = binaryVectorDegree(r1);
+    int r2_degree = n;
+    int q_degree = r2_degree - r1_degree;
+    while(r2_degree >= r1_degree){
+        q.elements[q_degree] ^= 1;
+        BinaryVector shift_r1 = shiftVector(r1, q_degree);
+        addBinaryVectors(r2, r2, shift_r1);
+        freeBinaryVector(shift_r1);
+        r2_degree = binaryVectorDegree(r2);
+        q_degree = r2_degree - r1_degree;
     }
 
-    freeBinaryVector(r0);
-    freeBinaryVector(s1);
+    // Initialisation de l'AEE après le tour1
+    BinaryVector u0 = initBinaryVector(n); // u1 = u0-qu1 = u0
+    BinaryVector u1 = initUnitVector(n, 0); //pour le premier tour, u0 = u1 = 0
+    BinaryVector v0 = initUnitVector(n, 0); //directement v0<-v1
+    BinaryVector v1 = binaryVectorProduct(q,v0); //v1 = v0-qv1 or v0 =v1 juste au dessus
+    freeBinaryVector(q);
 
-    return s0;
+    recopyBinaryVector(r0, r1);
+    recopyBinaryVector(r1, r2);
+    // AEE tourne tant que r1!=0
+    while(hammingWeight(r1)!=0){
+        recopyBinaryVector(r2, r0);
+        r1_degree = binaryVectorDegree(r1);
+        q = initBinaryVector(n);
+        printf("hello");
+        //Division euclidienne
+        while(r2_degree >= r1_degree){
+            r2_degree = binaryVectorDegree(r2);
+            q_degree = r2_degree - r1_degree;
+            q.elements[q_degree] ^= 1;
+            BinaryVector s1 = shiftVector(r1, q_degree);
+            addBinaryVectors(r2, r2, s1);
+            freeBinaryVector(s1);
+            printf("free s1 done");
+        }
+        printBinaryVector(u1);
+        BinaryVector u1_bis = copyBinaryVector(u1);
+        BinaryVector qu1 = binaryVectorProduct(q,u1);
+        addBinaryVectors(u1, u0, qu1); //u1 <- u0-qu1
+        printf("u1 = ");
+        printBinaryVector(u1);
+        printf("u1_bis = ");
+        printBinaryVector(u1_bis);
+        recopyBinaryVector(u0, u1_bis);
+        freeBinaryVector(u1_bis);
+        freeBinaryVector(qu1);
+
+        BinaryVector v1_bis = copyBinaryVector(v1);
+        BinaryVector qv1 = binaryVectorProduct(q,v1);
+        addBinaryVectors(v1, v0, qv1); //v1 <- v0-qv1
+        recopyBinaryVector(v0, v1_bis);// v0<-v1
+        freeBinaryVector(v1_bis);
+        freeBinaryVector(qv1);
+
+        recopyBinaryVector(r0, r1);
+        recopyBinaryVector(r1, r2);
+        freeBinaryVector(q);
+    }
+    freeBinaryVector(u0);
+    freeBinaryVector(u1);
+    freeBinaryVector(v1);
+    freeBinaryVector(r0);
+    freeBinaryVector(r1);
+    freeBinaryVector(r2);
+    return v0;
 }

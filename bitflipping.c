@@ -15,20 +15,19 @@ int max(int a,int b){
 
 // Fonction RotMat
 BinaryMatrix rotMat(BinaryVector h0, BinaryVector h1){
-    BinaryMatrix M;
-    M.rows = max(h0.size, h1.size);
-    M.cols = h0.size + h1.size;
-    M.elements = (bool **)malloc(M.rows * sizeof(bool *));
-
-    for(int i=0; i<M.rows; i++){
-        M.elements[i] = (bool *)malloc(M.cols * sizeof(bool));
+    BinaryMatrix M = initBinaryMatrix(h0.size, 2*h0.size);
+    if(h0.size != h1.size){
+        printf("[+] size error : the two vectors have to be the same size.");
+        return M;
+    }
+    for(int i=0; i<h0.size; i++){
         //first block : h0
         for(int j =0; j<h0.size; j++){
-            M.elements[i][j] = h0.elements[j-i % h0.size];
+            M.elements[i][j] = h0.elements[(j-i+h0.size) % h0.size]; //important : il faut rester positif !
         }
         //second block : h1
         for(int j =0; j<h1.size; j++){
-            M.elements[i][j+h0.size] = h0.elements[j-i % h1.size];
+            M.elements[i][j+h0.size] = h1.elements[(j-i+h0.size) % h1.size];
         }
     }
     return M;
@@ -48,12 +47,12 @@ BinaryVector Verification(BinaryVector s, BinaryMatrix H, BinaryVector u, Binary
         verification.elements[k] = s.elements[k] ^ Huv.elements[k];
         k+=1;
     } while ((verification.elements[k-1] == 0) & (k < verification.size));
-    freeBinaryVector(verification);
     freeBinaryVector(Huv);
     if(k == verification.size){
         fprintf(stderr, "algorithm fail");
         exit(EXIT_FAILURE);
     }
+    freeBinaryVector(verification);
     return uv;
 }
 
@@ -63,27 +62,40 @@ BinaryVector BitFlipping(BinaryVector h0, BinaryVector h1, BinaryVector s, int T
     BinaryMatrix H = rotMat(h0,h1);
     BinaryVector u = initBinaryVector(n);
     BinaryVector v = initBinaryVector(n);
-    BinaryVector syndrome = s;
+    BinaryVector syndrome = copyBinaryVector(s);
+    int k = 0;
     while((hammingWeight(u)!=t || hammingWeight(v)!=t) && hammingWeight(syndrome)!= 0){
+        printf("loop n°%d\n",k);
         Vector sum = matrixVectorProduct(syndrome, H);
-
+        printf("sum = ");
+        printVector(sum);
         BinaryVector flp_pos = initBinaryVector(2*n);
-        for(int i=0; i<H.cols; i++){
-            if(sum.elements[i] >= T){
-                flp_pos.elements[i] = !flp_pos.elements[i];
-            }
+        for(int i=0; i<2*n; i++){
+            if(sum.elements[i] >= T){flp_pos.elements[i] ^= 1;}
         }
+        freeVector(sum);
+        printf("flp_pos = ");
+        printBinaryVector(flp_pos);
+
         //(u|v) XOR flipped_positions
         for(int i=0; i<n;i++){
-            u.elements[i] = u.elements[i] ^ flp_pos.elements[i];
-            v.elements[i] = v.elements[i] ^ flp_pos.elements[n+i];
+            u.elements[i] ^= flp_pos.elements[i];
+            v.elements[i] ^= flp_pos.elements[n+i];
         }
+        printf("u = ");
+        printBinaryVector(u);
+        printf("v = ");
+        printBinaryVector(v);
         // H * flipped_positions ^T
         BinaryVector HprodFLP = binaryMatrixVectorProduct(H, flp_pos);
-        for(int i = 0; i < syndrome.size; i++){
-            syndrome.elements[i] = syndrome.elements[i] ^ HprodFLP.elements[i];
-        }
+        addBinaryVectors(syndrome, syndrome, HprodFLP);
+        freeBinaryVector(flp_pos);
+        freeBinaryVector(HprodFLP);
+        k += 1;
     }
     BinaryVector Return = Verification(s, H, u, v);
+    freeBinaryMatrix(H);
+    freeBinaryVector(syndrome);
+
     return Return;
 }
