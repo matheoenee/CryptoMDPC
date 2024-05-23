@@ -22,18 +22,20 @@
 #endif
 
 int main() {
-    int n = 1000; // le nombre de tests
-    int size = 64;
-    int w = 23;
-    int t = 3;
+    int n = 100; // le nombre de tests
+    srand(time(NULL));
+    int size = 4813;
+    int w = 39;
+    int t = 39;
+    int T = 26;
     int good =0;
     for(int i=0; i<n; i++){
         BinaryVector h0 = randomBinaryVectorHW(size, w);
         BinaryVector h1 = randomBinaryVectorHW(size, w);
         BinaryVector e0 = randomBinaryVectorHW(size, t);
         BinaryVector e1 = randomBinaryVectorHW(size, w);
-        BinaryVector e = initBinaryVector(size);
-        for(int l=0; l<size; l++){
+        BinaryVector e = initBinaryVector(2*size);
+        for(int l=0; l<2*size; l++){
             e.elements[i] = e0.elements[i];
             e.elements[i+size] = e1.elements[i];
         }
@@ -42,7 +44,7 @@ int main() {
         BinaryVector s = initBinaryVector(size);
         addBinaryVectors(s, s0, s1);
 
-        BinaryVector output = BitFlipping(h0,h1, s, 5, t);
+        BinaryVector output = BitFlipping(h0,h1, s, T, t);
         if(areBinaryVectorEqual(output, e)){
             printf("algorithm sucess");
             good+=1;
@@ -64,6 +66,10 @@ int main() {
 
     return 0;
 }
+
+/*
+ *
+ */
 
 /*
 int main() {

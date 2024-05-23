@@ -23,11 +23,11 @@ BinaryMatrix rotMat(BinaryVector h0, BinaryVector h1){
     for(int i=0; i<h0.size; i++){
         //first block : h0
         for(int j =0; j<h0.size; j++){
-            M.elements[i][j] = h0.elements[(j-i+h0.size) % h0.size]; //important : il faut rester positif !
+            M.elements[j][i] = h0.elements[(j-i+h0.size) % h0.size]; //important : il faut rester positif !
         }
         //second block : h1
         for(int j =0; j<h1.size; j++){
-            M.elements[i][j+h0.size] = h1.elements[(j-i+h0.size) % h1.size];
+            M.elements[j][i+h0.size] = h1.elements[(j-i+h0.size) % h1.size];
         }
     }
     return M;
@@ -41,18 +41,9 @@ BinaryVector Verification(BinaryVector s, BinaryMatrix H, BinaryVector u, Binary
         uv.elements[i + s.size] = v.elements[i];
     }
     BinaryVector Huv = binaryMatrixVectorProduct(H, uv);
-    BinaryVector verification = initBinaryVector(s.size);
-    int k = 0;
-    do{
-        verification.elements[k] = s.elements[k] ^ Huv.elements[k];
-        k+=1;
-    } while ((verification.elements[k-1] == 0) & (k < verification.size));
-    freeBinaryVector(Huv);
-    if(k == verification.size){
-        fprintf(stderr, "algorithm fail");
-        exit(EXIT_FAILURE);
+    if(areBinaryVectorEqual(s, Huv)){
+        fprintf(stderr, "verification error.\n");
     }
-    freeBinaryVector(verification);
     return uv;
 }
 
