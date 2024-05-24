@@ -41,8 +41,9 @@ BinaryVector Verification(BinaryVector s, BinaryMatrix H, BinaryVector u, Binary
         uv.elements[i + s.size] = v.elements[i];
     }
     BinaryVector Huv = binaryMatrixVectorProduct(H, uv);
-    if(areBinaryVectorEqual(s, Huv)){
-        fprintf(stderr, "verification error.\n");
+    if(!areBinaryVectorEqual(s, Huv)){
+        fprintf(stderr, "[+] Verification failure. End of the program.");
+        exit(EXIT_FAILURE);
     }
     return uv;
 }
@@ -87,6 +88,8 @@ BinaryVector BitFlipping(BinaryVector h0, BinaryVector h1, BinaryVector s, int T
     BinaryVector Return = Verification(s, H, u, v);
     freeBinaryMatrix(H);
     freeBinaryVector(syndrome);
+    freeBinaryVector(u);
+    freeBinaryVector(v);
 
     return Return;
 }

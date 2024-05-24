@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <time.h>
+#include <openssl/sha.h>
+#include <openssl/evp.h>
 
 #include "binary_inverse.h"
 #include "prange.h"
 #include "matrix.h"
 #include "bitflipping.h"
+#include "mdpc.h"
 
 // Utilisez les valeurs passées par le préprocesseur pour n, k, et t
 #ifndef PARAM_N
@@ -22,53 +26,100 @@
 #endif
 
 int main() {
-    int n = 100; // le nombre de tests
+    int rounds = 100;
+    int size = 4813;
+    int w = 39;
+    int t = 78;
+    int T = 26;
+
+    int good = 0;
+
+    clock_t start, end;
+    double cpu_time_used;
+    start = clock();
+    for(int i=0; i<rounds; i++){
+        printf("round %d over %d", i+1, rounds);
+        BinaryVector* aliceGen = gen_h(size, w, false);
+        BinaryVector h = copyBinaryVector(aliceGen[0]);// sent to Bob
+        BinaryVector* bobGen = gen_e(size, t, h, false);
+        BinaryVector c1 = copyBinaryVector(bobGen[0]); // sent to Alice
+        unsigned char* hashAlice = aliceComputeSecret(aliceGen[1], aliceGen[2], c1, T, t);
+        unsigned char* hashBob = bobComputeSecret(bobGen[1], bobGen[2]);
+
+        if(areHashsIdentical(hashAlice, hashBob, SHA256_DIGEST_LENGTH)){
+            printf("hash are identical !\n");
+            good += 1;
+        }
+        freeBinaryVector(c1);
+        freeBinaryVector(h);
+        freeBinaryVector(aliceGen[0]);
+        freeBinaryVector(aliceGen[1]);
+        freeBinaryVector(aliceGen[2]);
+        free(aliceGen);
+        freeBinaryVector(bobGen[0]);
+        freeBinaryVector(bobGen[1]);
+        freeBinaryVector(bobGen[2]);
+        free(bobGen);
+    }
+    end = clock();
+    printf("number of sucess : %d/%d\n", good, rounds);
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Executing time for %d MDPC : %f s\n", rounds, cpu_time_used);
+
+    return 0;
+}
+
+/*    int n = 1000; // le nombre de tests
     srand(time(NULL));
     int size = 4813;
     int w = 39;
-    int t = 39;
+    int t = 78;
     int T = 26;
     int good =0;
+    clock_t start, end;
+    double cpu_time_used;
+    start = clock();
     for(int i=0; i<n; i++){
+        printf("round %d\n", i);
         BinaryVector h0 = randomBinaryVectorHW(size, w);
         BinaryVector h1 = randomBinaryVectorHW(size, w);
-        BinaryVector e0 = randomBinaryVectorHW(size, t);
-        BinaryVector e1 = randomBinaryVectorHW(size, w);
-        BinaryVector e = initBinaryVector(2*size);
-        for(int l=0; l<2*size; l++){
-            e.elements[i] = e0.elements[i];
-            e.elements[i+size] = e1.elements[i];
+        BinaryVector e = randomBinaryVectorHW(2*size, t);
+        BinaryVector e0 = initBinaryVector(size);
+        BinaryVector e1 = initBinaryVector(size);
+        for(int l=0; l<size; l++){
+            e0.elements[l] = e.elements[l];
+            e1.elements[l] = e.elements[l+size];
         }
         BinaryVector s0 = binaryVectorProduct(h0, e0);
         BinaryVector s1 = binaryVectorProduct(h1, e1);
         BinaryVector s = initBinaryVector(size);
         addBinaryVectors(s, s0, s1);
 
-        BinaryVector output = BitFlipping(h0,h1, s, T, t);
+        BinaryVector output = BitFlipping(h0,h1, s, T, 2*t);
+        //printf("output = ");
+        //printBinaryVector(output);
+        //printf("initial error = ");
+        //printBinaryVector(e);
         if(areBinaryVectorEqual(output, e)){
-            printf("algorithm sucess");
+            printf("algorithm sucess !\n");
             good+=1;
         }
-        printf("end of round %d", i);
         freeBinaryVector(h0);
         freeBinaryVector(h1);
         freeBinaryVector(e0);
         freeBinaryVector(e1);
-        freeBinaryVector(e0);
         freeBinaryVector(e);
         freeBinaryVector(s0);
         freeBinaryVector(s1);
         freeBinaryVector(s);
         freeBinaryVector(output);
     }
-
+    end = clock();
     printf("number of sucess : %d/%d\n", good, n);
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Executing time for %d bitflips : %f s\n", n, cpu_time_used);
 
     return 0;
-}
-
-/*
- *
  */
 
 /*
