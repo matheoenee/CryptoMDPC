@@ -57,7 +57,7 @@ BinaryVector BitFlipping(BinaryVector h0, BinaryVector h1, BinaryVector s, int T
     BinaryVector syndrome = copyBinaryVector(s);
     int k = 0;
     while((hammingWeight(u)!=t || hammingWeight(v)!=t) && hammingWeight(syndrome)!= 0){
-        //printf("loop n°%d\n",k);
+        printf("loop n°%d\n",k);
         Vector sum = matrixVectorProduct(syndrome, H);
         //printf("sum = ");
         //printVector(sum);
@@ -66,8 +66,7 @@ BinaryVector BitFlipping(BinaryVector h0, BinaryVector h1, BinaryVector s, int T
             if(sum.elements[i] >= T){flp_pos.elements[i] ^= 1;}
         }
         freeVector(sum);
-        //printf("flp_pos = ");
-        //printBinaryVector(flp_pos);
+        printf("weight of flp_pos: %d", hammingWeight(flp_pos));
 
         //(u|v) XOR flipped_positions
         for(int i=0; i<n;i++){
@@ -84,6 +83,8 @@ BinaryVector BitFlipping(BinaryVector h0, BinaryVector h1, BinaryVector s, int T
         freeBinaryVector(flp_pos);
         freeBinaryVector(HprodFLP);
         k += 1;
+        printf("weight of syndrome : %d\nweight of u : %d\nweight of v : %d\n", hammingWeight(syndrome), hammingWeight(u),
+               hammingWeight(v));
     }
     BinaryVector Return = Verification(s, H, u, v);
     freeBinaryMatrix(H);

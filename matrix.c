@@ -22,7 +22,20 @@ BinaryMatrix initBinaryMatrix(int rows, int cols){
     return A;
 }
 
-// Fonnction pour créer un vecteur binaire
+// Fonction pour créer une liste de vecteurs binaires
+BinaryVectors initBinaryVectors(int size, int length){
+    BinaryVectors V;
+    V.size = size;
+    V.length = length;
+    BinaryVector *elements = (BinaryVector*)malloc(size * sizeof(BinaryVector));
+    for(int i = 0; i < size; i++){
+        elements[i] = initBinaryVector(length);
+    }
+    V.vectors = elements;
+    return V;
+}
+
+// Fonction pour créer un vecteur binaire
 BinaryVector initBinaryVector(int size){
     BinaryVector u;
     u.size = size;
@@ -216,6 +229,14 @@ void freeBinaryMatrix(BinaryMatrix A) {
         free(A.elements[i]);
     }
     free(A.elements);
+}
+
+// Fonction pour libérer la mémoire d'une liste de vecteurs binaires
+void freeBinaryVectors(BinaryVectors V) {
+    for (int i = 0; i < V.size; i++) {
+        freeBinaryVector(V.vectors[i]);
+    }
+    free(V.vectors);
 }
 
 // Fonction pour afficher une matrice

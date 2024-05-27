@@ -67,7 +67,7 @@ bool areHashsIdentical(unsigned char *hash1, unsigned char *hash2, size_t length
 }
 
 //retourne h, h0, h1
-BinaryVector* gen_h(int size, int weight, bool needRandom){
+void gen_h(BinaryVectors data, int size, int weight, bool needRandom){
     printf("alice starts her protocol\n");
     if(needRandom) srand(time(NULL));
     BinaryVector h0 = randomBinaryVectorHW(size, weight);
@@ -75,18 +75,16 @@ BinaryVector* gen_h(int size, int weight, bool needRandom){
     BinaryVector invh0 = invertBinaryVector(h0);
     BinaryVector h = binaryVectorProduct(h1, invh0);
     freeBinaryVector(invh0);
-    BinaryVector *temp = (BinaryVector*) malloc(3* sizeof(BinaryVector));
-    temp[0] = initBinaryVector(h.size);
-    temp[1] = initBinaryVector(h0);
-    temp[2] = initBinaryVector(h1);
-    recopyBinaryVector(temp[0], h);// temp[0] = h
-    recopyBinaryVector(temp[1], h0);// temp[1] = h0
-    recopyBinaryVector(temp[2], h1);// temp[2] = h1
-    return temp;
+
+    //BinaryVectors data = initBinaryVectors(3, size);
+    recopyBinaryVector(data.vectors[0], h);
+    recopyBinaryVector(data.vectors[1], h0);
+    recopyBinaryVector(data.vectors[2], h1);
+    //return data;
 }
 
 // Retourne c1, e0, e1
-BinaryVector* gen_e(int size, int t, BinaryVector h, bool needRandom){
+void gen_e(BinaryVectors data, int size, int t, BinaryVector h, bool needRandom){
     printf("bob starts his protocol\n");
     if(needRandom) srand(time(NULL));
     BinaryVector e = randomBinaryVectorHW(2*size, 2*t); // e = (e0|e1)
@@ -96,22 +94,24 @@ BinaryVector* gen_e(int size, int t, BinaryVector h, bool needRandom){
         e0.elements[i] = e.elements[i];
         e1.elements[i] = e.elements[i+size];
     }
-    printf("vectors e0, e1 exists\n");
     BinaryVector c1 = binaryVectorProduct(h,e1);
     addBinaryVectors(c1, e0, c1); //c1 = e0 + he1
-    BinaryVector *temp = (BinaryVector*) malloc(3* sizeof(BinaryVector));
-    temp[0] = initBinaryVector(c1.size);
-    temp[1] = initBinaryVector(e0.size);
-    temp[2] = initBinaryVector(e1.size);
-    recopyBinaryVector(temp[0], c1);// temp[0] = c1
-    recopyBinaryVector(temp[1], e0);// temp[1] = e0
-    recopyBinaryVector(temp[2], e0);// temp[2] = e1
-    freeBinaryVector(e);
-    return temp;
+
+    //BinaryVectors data = initBinaryVectors(3, size);
+    recopyBinaryVector(data.vectors[0], c1);// data[0] = c1
+    recopyBinaryVector(data.vectors[1], e0);// data[1] = e0
+    recopyBinaryVector(data.vectors[2], e1);// data[2] = e1
+
+    freeBinaryVector(c1);
+    freeBinaryVector(e0);
+    freeBinaryVector(e1);
+
+    //return data;
 }
 
 unsigned char* aliceComputeSecret(BinaryVector h0, BinaryVector h1, BinaryVector c1, int t, int w){
     BinaryVector s = binaryVectorProduct(h0, c1);
+    printf("bitflipping!\n");
     BinaryVector e = BitFlipping(h0, h1, s, t, w);
     unsigned char* hash = hashBinaryVector(&e);
     freeBinaryVector(s);

@@ -26,31 +26,33 @@
 #endif
 
 int main() {
-    int rounds = 100;
+    int rounds = 5;
     int size = 4813;
     int w = 39;
     int t = 78;
     int T = 26;
 
     int good = 0;
-    /*
+
     clock_t start, end;
     double cpu_time_used;
-    start = clock();*/
+    start = clock();
+
     for(int i=0; i<rounds; i++){
         printf("round %d over %d\n", i+1, rounds);
-        BinaryVector* aliceGen = gen_h(size, w, false); // takes some times (around 140s)
-        printf("aliceGen done !\n");
-        BinaryVector h = copyBinaryVector(aliceGen[0]);// sent to Bob
-        //BinaryVector h = randomBinaryVectorHW(size, t);
-        printf("h = ");
-        printBinaryVector(h);
-        BinaryVector* bobGen = gen_e(size, t, h, false);
-        BinaryVector c1 = copyBinaryVector(bobGen[0]); // sent to Alice
-        printf("c1 = ");
-        printBinaryVector(c1);
-        unsigned char* hashAlice = aliceComputeSecret(aliceGen[1], aliceGen[2], c1, T, t);
-        unsigned char* hashBob = bobComputeSecret(bobGen[1], bobGen[2]);
+        BinaryVectors aliceGen = initBinaryVectors(3, size);
+        gen_h(aliceGen, size, w, false); // takes some times (around 140s)
+
+        BinaryVector h = copyBinaryVector(aliceGen.vectors[0]);// sent to Bob
+
+        BinaryVectors bobGen = initBinaryVectors(3, size);
+        gen_e(bobGen, size, t, h, false);
+        BinaryVector c1 = copyBinaryVector(bobGen.vectors[0]); // sent to Alice
+
+        printf("computing alice secret\n");
+        unsigned char* hashAlice = aliceComputeSecret(aliceGen.vectors[1], aliceGen.vectors[2], c1, T, t);
+        printf("computing bob secret\n");
+        unsigned char* hashBob = bobComputeSecret(bobGen.vectors[1], bobGen.vectors[2]);
         printf("hashs exists\n");
         if(areHashsIdentical(hashAlice, hashBob, SHA256_DIGEST_LENGTH)){
             printf("hashs are identical !\n");
@@ -60,22 +62,17 @@ int main() {
         freeBinaryVector(c1);
         printf("c1 is free\n");
         freeBinaryVector(h);
+        printf("h is free\n");
 
-        freeBinaryVector(aliceGen[0]);
-        freeBinaryVector(aliceGen[1]);
-        freeBinaryVector(aliceGen[2]);
-        free(aliceGen);
+        freeBinaryVectors(aliceGen);
         printf("alice is now free\n");
-        freeBinaryVector(bobGen[0]);
-        freeBinaryVector(bobGen[1]);
-        freeBinaryVector(bobGen[2]);
-        free(bobGen);
+        freeBinaryVectors(bobGen);
         printf("bobGen is now free\n");
     }
-    //end = clock();
-    //printf("number of sucess : %d/%d\n", good, rounds);
-    //cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    //printf("Executing time for %d MDPC : %f s\n", rounds, cpu_time_used);
+    end = clock();
+    printf("number of sucess : %d/%d\n", good, rounds);
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Executing time for %d MDPC : %f s\n", rounds, cpu_time_used);
 
     return 0;
 }

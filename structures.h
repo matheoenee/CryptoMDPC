@@ -19,4 +19,10 @@ typedef struct {
     int cols;
 } BinaryMatrix;
 
+typedef struct {
+    BinaryVector *vectors;
+    int size;
+    int length;
+}BinaryVectors;
+
 #endif //CRYPTOMDPC_STRUCTURES_H

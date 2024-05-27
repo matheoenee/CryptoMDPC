@@ -18,9 +18,9 @@ void printHash(unsigned char *hash);
 
 bool areHashsIdentical(unsigned char *hash1, unsigned char *hash2, size_t lenght);
 
-BinaryVector* gen_h(int size, int weight, bool needRandom);
+BinaryVectors gen_h(int size, int weight, bool needRandom);
 
-BinaryVector* gen_e(int size, int t, BinaryVector h, bool needRandom);
+BinaryVectors gen_e(int size, int t, BinaryVector h, bool needRandom);
 
 unsigned char* aliceComputeSecret(BinaryVector h0, BinaryVector h1, BinaryVector c1, int t, int w);
 

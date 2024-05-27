@@ -7,7 +7,10 @@
 // Fonction pour créer une matrice binaire
 BinaryMatrix initBinaryMatrix(int rows, int cols);
 
-// Fonnction pour créer un vecteur binaire
+// Fonction pour créer une liste de vecteurs binaires
+BinaryVectors initBinaryVectors(int size, int length);
+
+// Fonction pour créer un vecteur binaire
 BinaryVector initBinaryVector(int n);
 
 // Pour entrer les valeurs d'un vecteur dans un autre
@@ -54,6 +57,9 @@ void freeVector(Vector u);
 
 // Fonction pour libérer la mémoire d'une matrice binaire
 void freeBinaryMatrix(BinaryMatrix A);
+
+// Fonction pour libérer la mémoire d'une liste de vecteurs binaires
+void freeBinaryVectors(BinaryVectors V);
 
 // Fonction pour afficher une matrice
 void printBinaryMatrix(BinaryMatrix A);
