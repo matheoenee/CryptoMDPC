@@ -186,6 +186,7 @@ BinaryVector shiftVector(BinaryVector u, int shift){
 
 int binaryVectorDegree(BinaryVector u){
     int i = u.size - 1;
+    if(hammingWeight(u)==0) return 0;
     while(!u.elements[i]){i--;}
     return i;
 }
@@ -269,14 +270,7 @@ BinaryVector invertBinaryVector(BinaryVector vector) {
     BinaryVector r1 = copyBinaryVector(vector);
     BinaryVector r2 = initBinaryVector(n);
     BinaryVector q = initBinaryVector(n);
-    /*
-    BinaryVector u = initBinaryVector(n);
-    BinaryVector v = initBinaryVector(n);
-    BinaryVector u0 = initUnitVector(n, 0);
-    BinaryVector u1 = initBinaryVector(n);
-    BinaryVector v0 = initBinaryVector(n);
-    BinaryVector v1 = initUnitVector(n,0);
-    */
+
     //Division euclidienne de x^n+1 par u
     int r1_degree = binaryVectorDegree(r1);
     int r2_degree = n;
@@ -289,10 +283,9 @@ BinaryVector invertBinaryVector(BinaryVector vector) {
         r2_degree = binaryVectorDegree(r2);
         q_degree = r2_degree - r1_degree;
     }
-
     // Initialisation de l'AEE après le tour1
-    BinaryVector u0 = initBinaryVector(n); // u1 = u0-qu1 = u0
-    BinaryVector u1 = initUnitVector(n, 0); //pour le premier tour, u0 = u1 = 0
+    BinaryVector u0 = initBinaryVector(n); //pour le premier tour, u0 = u1 = 0
+    BinaryVector u1 = initUnitVector(n, 0); // u1 = u0-qu1 = u0
     BinaryVector v0 = initUnitVector(n, 0); //directement v0<-v1
     BinaryVector v1 = binaryVectorProduct(q,v0); //v1 = v0-qv1 or v0 =v1 juste au dessus
     freeBinaryVector(q);
@@ -300,29 +293,25 @@ BinaryVector invertBinaryVector(BinaryVector vector) {
     recopyBinaryVector(r0, r1);
     recopyBinaryVector(r1, r2);
     // AEE tourne tant que r1!=0
-    while(hammingWeight(r1)!=0){
+    while(hammingWeight(r2)!=0){
         recopyBinaryVector(r2, r0);
         r1_degree = binaryVectorDegree(r1);
         q = initBinaryVector(n);
-        printf("hello");
+        r2_degree = binaryVectorDegree(r2);
+        q_degree = r2_degree - r1_degree;
         //Division euclidienne
         while(r2_degree >= r1_degree){
-            r2_degree = binaryVectorDegree(r2);
-            q_degree = r2_degree - r1_degree;
+            if(r2_degree==0){r1_degree+=1;}// pour le cas deg(r2)=deg(r1)=0, ça tourne à l'infini
             q.elements[q_degree] ^= 1;
             BinaryVector s1 = shiftVector(r1, q_degree);
             addBinaryVectors(r2, r2, s1);
             freeBinaryVector(s1);
-            printf("free s1 done");
+            r2_degree = binaryVectorDegree(r2);
+            q_degree = r2_degree - r1_degree;
         }
-        printBinaryVector(u1);
         BinaryVector u1_bis = copyBinaryVector(u1);
         BinaryVector qu1 = binaryVectorProduct(q,u1);
         addBinaryVectors(u1, u0, qu1); //u1 <- u0-qu1
-        printf("u1 = ");
-        printBinaryVector(u1);
-        printf("u1_bis = ");
-        printBinaryVector(u1_bis);
         recopyBinaryVector(u0, u1_bis);
         freeBinaryVector(u1_bis);
         freeBinaryVector(qu1);
