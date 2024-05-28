@@ -6,9 +6,10 @@
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 
+#include "structures.h"
+#include "matrix.h"
 #include "binary_inverse.h"
 #include "prange.h"
-#include "matrix.h"
 #include "bitflipping.h"
 #include "mdpc.h"
 
@@ -26,7 +27,7 @@
 #endif
 
 int main() {
-    int rounds = 5;
+    int rounds = 10;
     int size = 4813;
     int w = 39;
     int t = 78;
@@ -45,29 +46,40 @@ int main() {
 
         BinaryVector h = copyBinaryVector(aliceGen.vectors[0]);// sent to Bob
 
+        BinaryVector verif1 = binaryVectorProduct(h,aliceGen.vectors[1]);
+        BinaryVector verif2 = binaryVectorProduct(aliceGen.vectors[1], aliceGen.vectors[0]);
+        if(areBinaryVectorEqual(verif1,verif2)) {printf("it works\n"); }
+
         BinaryVectors bobGen = initBinaryVectors(3, size);
         gen_e(bobGen, size, t, h, false);
         BinaryVector c1 = copyBinaryVector(bobGen.vectors[0]); // sent to Alice
+        printf("w(e0) = %d\n", hammingWeight(bobGen.vectors[1]));
+        printf("w(e1) = %d\n", hammingWeight(bobGen.vectors[2]));
 
         printf("computing alice secret\n");
-        unsigned char* hashAlice = aliceComputeSecret(aliceGen.vectors[1], aliceGen.vectors[2], c1, T, t);
-        printf("computing bob secret\n");
-        unsigned char* hashBob = bobComputeSecret(bobGen.vectors[1], bobGen.vectors[2]);
+        unsigned char *hashAlice = (unsigned char *)malloc(SHA256_DIGEST_LENGTH);
+        unsigned char *hashBob = (unsigned char *)malloc(SHA256_DIGEST_LENGTH);
         printf("hashs exists\n");
-        if(areHashsIdentical(hashAlice, hashBob, SHA256_DIGEST_LENGTH)){
-            printf("hashs are identical !\n");
+        aliceComputeSecret(hashAlice, aliceGen.vectors[1], aliceGen.vectors[2], c1, T, t);
+        printf("computing bob secret\n");
+        bobComputeSecret(hashBob, bobGen.vectors[1], bobGen.vectors[2]);
+        printf("alice's hash: ");
+        printHash(hashAlice);
+        printf("bob's hash: ");
+        printHash(hashBob);
+
+        if(areHashsIdentical(hashAlice, hashBob)){
+            printf("hashs are identicals !\n");
             good += 1;
         }
         printf("free time\n");
         freeBinaryVector(c1);
-        printf("c1 is free\n");
         freeBinaryVector(h);
-        printf("h is free\n");
 
         freeBinaryVectors(aliceGen);
-        printf("alice is now free\n");
         freeBinaryVectors(bobGen);
-        printf("bobGen is now free\n");
+        free(hashAlice);
+        free(hashBob);
     }
     end = clock();
     printf("number of sucess : %d/%d\n", good, rounds);
