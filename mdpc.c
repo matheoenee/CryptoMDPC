@@ -63,7 +63,6 @@ bool areHashsIdentical(unsigned char *hash1, unsigned char *hash2){
 
 //retourne h, h0, h1
 void gen_h(BinaryVectors data, int size, int weight, bool needRandom){
-    printf("alice starts her protocol\n");
     if(needRandom) srand(time(NULL));
 
     BinaryVector h0 = randomBinaryVectorHW(size, weight);
@@ -79,7 +78,6 @@ void gen_h(BinaryVectors data, int size, int weight, bool needRandom){
 
 // Retourne c1, e0, e1
 void gen_e(BinaryVectors data, int size, int t, BinaryVector h, bool needRandom){
-    printf("bob starts his protocol\n");
     if(needRandom) srand(time(NULL));
     BinaryVector e = randomBinaryVectorHW(2*size, t); // e = (e0|e1)
     BinaryVector e0 = initBinaryVector(size);
@@ -102,10 +100,9 @@ void gen_e(BinaryVectors data, int size, int t, BinaryVector h, bool needRandom)
 
 
 // Fonction qui, à partir des données obtenues précédement par alice, lui permet d'obtenir le secret partagé avec bob
-void aliceComputeSecret(unsigned char* hash, BinaryVector h0, BinaryVector h1, BinaryVector c1, int t, int w){
+void aliceComputeSecret(unsigned char* hash, BinaryVector h0, BinaryVector h1, BinaryVector c1, int T, int w){
     BinaryVector s = binaryVectorProduct(h0, c1);
-    printf("bitflipping!\n");
-    BinaryVector e = BitFlipping(h0, h1, s, t, w);
+    BinaryVector e = BitFlipping(h0, h1, s, T, w);
     hashBinaryVector(hash, &e);
     freeBinaryVector(s);
     freeBinaryVector(e);

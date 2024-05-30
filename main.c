@@ -26,70 +26,187 @@
 #define PARAM_T 10
 #endif
 
+#ifndef PARAM_SIZE
+#define PARAM_SIZE 4813
+#endif
+
+#ifndef PARAM_WEIGHT_H
+#define PARAM_WEIGHT_H 39
+#endif
+
+#ifndef PARAM_WEIGHT_E
+#define PARAM_WEIGHT_E 78
+#endif
+
+#ifndef PARAM_THRESHOLD
+#define PARAM_THRESHOLD 26
+#endif
+
 int main() {
-    int rounds = 10;
-    int size = 4813;
-    int w = 39;
-    int t = 78;
-    int T = 26;
+    srand(time(NULL));
+    int size = PARAM_SIZE;
+    int w = PARAM_WEIGHT_H;
+    int t = PARAM_WEIGHT_E;
+    int T = PARAM_THRESHOLD;
+    printf("Temps d'exécution de l'algorithme MDPC avec les paramètres suivants :\n");
+    printf(" - Longueur : %d\n - Poids de h0 et h1 : %d\n - Poids de l'erreur (totale) : %d\n - Seuil T du bitflipping : %d\n", size, w, t, T);
+    clock_t step0, step1, step2, step3, step4, end;
+    double cpu_time_used;
+    step0 = clock();
+    BinaryVectors aliceGen = initBinaryVectors(3, size);
+    gen_h(aliceGen, size, w, false); // takes some times (around 140s)
 
-    int good = 0;
+    step1 = clock();
+    cpu_time_used = ((double) (step1 - step0)) / CLOCKS_PER_SEC;
+    printf("Temps pour l'algorithme gen_h : %f sec\n", cpu_time_used);
 
+    BinaryVector h = copyBinaryVector(aliceGen.vectors[0]);// sent to Bob
+    BinaryVectors bobGen = initBinaryVectors(3, size);
+    gen_e(bobGen, size, t, h, false);
+    step2 = clock();
+    cpu_time_used = ((double) (step2 - step1)) / CLOCKS_PER_SEC;
+    printf("Temps pour l'algorithme gen_e : %f sec\n", cpu_time_used);
+
+    BinaryVector c1 = copyBinaryVector(bobGen.vectors[0]); // sent to Alice
+
+    unsigned char *hashAlice = (unsigned char *)malloc(SHA256_DIGEST_LENGTH);
+    aliceComputeSecret(hashAlice, aliceGen.vectors[1], aliceGen.vectors[2], c1, T, t);
+    step3 = clock();
+    cpu_time_used = ((double) (step3 - step2)) / CLOCKS_PER_SEC;
+    printf("Temps pour l'algorithme aliceComputeSecret : %f sec\n", cpu_time_used);
+
+    unsigned char *hashBob = (unsigned char *)malloc(SHA256_DIGEST_LENGTH);
+    bobComputeSecret(hashBob, bobGen.vectors[1], bobGen.vectors[2]);
+    step4 = clock();
+    cpu_time_used = ((double) (step4 - step3)) / CLOCKS_PER_SEC;
+    printf("Temps pour l'algorithme bobComputeSecret : %f sec\n", cpu_time_used);
+    printf("Hash d'Alice: ");
+    printHash(hashAlice);
+    printf("Hash de Bob: ");
+    printHash(hashBob);
+    freeBinaryVector(c1);
+    freeBinaryVector(h);
+
+    freeBinaryVectors(aliceGen);
+    freeBinaryVectors(bobGen);
+    end = clock();
+    free(hashAlice);
+    free(hashBob);
+    cpu_time_used = ((double) (end - step0)) / CLOCKS_PER_SEC;
+    printf("Temps d'exécution total : %f sec\n", cpu_time_used);
+
+    return 0;
+}
+
+/* TIME MDPC
+int main() {
+    srand(time(NULL));
+    int size = PARAM_SIZE;
+    int w = PARAM_WEIGHT_H;
+    int t = PARAM_WEIGHT_E;
+    int T = PARAM_THRESHOLD;
+    printf("Temps d'exécution de l'algorithme MDPC avec les paramètres suivants :\n");
+    printf(" - Longueur : %d\n - Poids de h0 et h1 : %d\n - Poids de l'erreur (totale) : %d\n - Seuil T du bitflipping : %d\n", size, w, t, T);
+    clock_t step0, step1, step2, step3, step4, end;
+    double cpu_time_used;
+    step0 = clock();
+    BinaryVectors aliceGen = initBinaryVectors(3, size);
+    gen_h(aliceGen, size, w, false); // takes some times (around 140s)
+
+    step1 = clock();
+    cpu_time_used = ((double) (step1 - step0)) / CLOCKS_PER_SEC;
+    printf("Temps pour l'algorithme gen_h : %f sec\n", cpu_time_used);
+
+    BinaryVector h = copyBinaryVector(aliceGen.vectors[0]);// sent to Bob
+    BinaryVectors bobGen = initBinaryVectors(3, size);
+    gen_e(bobGen, size, t, h, false);
+    step2 = clock();
+    cpu_time_used = ((double) (step2 - step1)) / CLOCKS_PER_SEC;
+    printf("Temps pour l'algorithme gen_e : %f sec\n", cpu_time_used);
+
+    BinaryVector c1 = copyBinaryVector(bobGen.vectors[0]); // sent to Alice
+
+    unsigned char *hashAlice = (unsigned char *)malloc(SHA256_DIGEST_LENGTH);
+    aliceComputeSecret(hashAlice, aliceGen.vectors[1], aliceGen.vectors[2], c1, T, t);
+    step3 = clock();
+    cpu_time_used = ((double) (step3 - step2)) / CLOCKS_PER_SEC;
+    printf("Temps pour l'algorithme aliceComputeSecret : %f sec\n", cpu_time_used);
+
+    unsigned char *hashBob = (unsigned char *)malloc(SHA256_DIGEST_LENGTH);
+    bobComputeSecret(hashBob, bobGen.vectors[1], bobGen.vectors[2]);
+    step4 = clock();
+    cpu_time_used = ((double) (step4 - step3)) / CLOCKS_PER_SEC;
+    printf("Temps pour l'algorithme bobComputeSecret : %f sec\n", cpu_time_used);
+    printf("Hash d'Alice: ");
+    printHash(hashAlice);
+    printf("Hash de Bob: ");
+    printHash(hashBob);
+    freeBinaryVector(c1);
+    freeBinaryVector(h);
+
+    freeBinaryVectors(aliceGen);
+    freeBinaryVectors(bobGen);
+    end = clock();
+    free(hashAlice);
+    free(hashBob);
+    cpu_time_used = ((double) (end - step0)) / CLOCKS_PER_SEC;
+    printf("Temps d'exécution total : %f sec\n", cpu_time_used);
+
+    return 0;
+}
+*/
+/* MEAN TIME MDPC
+int main() {
+    srand(time(NULL));
+    int round = 10;
+    int size = PARAM_SIZE;
+    int w = PARAM_WEIGHT_H;
+    int t = PARAM_WEIGHT_E;
+    int T = PARAM_THRESHOLD;
+    printf("Algorithme MDPC effectué avec les paramètres suivants :\n");
+    printf(" - Longueur : %d\n - Poids de h0 et h1 : %d\n - Poids de l'erreur (totale) : %d\n - Seuil T du bitflipping : %d\n", size, w, t, T);
     clock_t start, end;
     double cpu_time_used;
     start = clock();
-
-    for(int i=0; i<rounds; i++){
-        printf("round %d over %d\n", i+1, rounds);
+    for(int i=0; i< round; i++){
+        printf("Tour %d sur %d\n", i, round);
         BinaryVectors aliceGen = initBinaryVectors(3, size);
-        gen_h(aliceGen, size, w, false); // takes some times (around 140s)
-
+        gen_h(aliceGen, size, w, false);
         BinaryVector h = copyBinaryVector(aliceGen.vectors[0]);// sent to Bob
-
-        BinaryVector verif1 = binaryVectorProduct(h,aliceGen.vectors[1]);
-        BinaryVector verif2 = binaryVectorProduct(aliceGen.vectors[1], aliceGen.vectors[0]);
-        if(areBinaryVectorEqual(verif1,verif2)) {printf("it works\n"); }
 
         BinaryVectors bobGen = initBinaryVectors(3, size);
         gen_e(bobGen, size, t, h, false);
         BinaryVector c1 = copyBinaryVector(bobGen.vectors[0]); // sent to Alice
-        printf("w(e0) = %d\n", hammingWeight(bobGen.vectors[1]));
-        printf("w(e1) = %d\n", hammingWeight(bobGen.vectors[2]));
 
-        printf("computing alice secret\n");
         unsigned char *hashAlice = (unsigned char *)malloc(SHA256_DIGEST_LENGTH);
-        unsigned char *hashBob = (unsigned char *)malloc(SHA256_DIGEST_LENGTH);
-        printf("hashs exists\n");
         aliceComputeSecret(hashAlice, aliceGen.vectors[1], aliceGen.vectors[2], c1, T, t);
-        printf("computing bob secret\n");
-        bobComputeSecret(hashBob, bobGen.vectors[1], bobGen.vectors[2]);
-        printf("alice's hash: ");
-        printHash(hashAlice);
-        printf("bob's hash: ");
-        printHash(hashBob);
 
-        if(areHashsIdentical(hashAlice, hashBob)){
-            printf("hashs are identicals !\n");
-            good += 1;
-        }
-        printf("free time\n");
+        unsigned char *hashBob = (unsigned char *)malloc(SHA256_DIGEST_LENGTH);
+        bobComputeSecret(hashBob, bobGen.vectors[1], bobGen.vectors[2]);
+        printf("Hash d'Alice: ");
+        printHash(hashAlice);
+        printf("Hash de Bob: ");
+        printHash(hashBob);
         freeBinaryVector(c1);
         freeBinaryVector(h);
 
         freeBinaryVectors(aliceGen);
         freeBinaryVectors(bobGen);
+
         free(hashAlice);
         free(hashBob);
+        printf("Fin de tour\n");
     }
     end = clock();
-    printf("number of sucess : %d/%d\n", good, rounds);
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    printf("Executing time for %d MDPC : %f s\n", rounds, cpu_time_used);
+    printf("Temps d'exécution moyen : %f sec\n", cpu_time_used/round);
 
     return 0;
 }
 
-/*    int n = 1000; // le nombre de tests
+
+/* TIME BITFLIP
+    int n = 1000; // le nombre de tests
     srand(time(NULL));
     int size = 4813;
     int w = 39;
@@ -116,10 +233,6 @@ int main() {
         addBinaryVectors(s, s0, s1);
 
         BinaryVector output = BitFlipping(h0,h1, s, T, 2*t);
-        //printf("output = ");
-        //printBinaryVector(output);
-        //printf("initial error = ");
-        //printBinaryVector(e);
         if(areBinaryVectorEqual(output, e)){
             printf("algorithm sucess !\n");
             good+=1;
